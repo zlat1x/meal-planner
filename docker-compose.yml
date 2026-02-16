@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: meal_planner_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: meal_planner
+      POSTGRES_USER: meal_user
+      POSTGRES_PASSWORD: meal_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - meal_planner_pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+
+volumes:
+  meal_planner_pgdata:
