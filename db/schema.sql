@@ -1,5 +1,5 @@
 -- Meal Planner DB schema (PostgreSQL)
--- Synced with updated ERD (full names + quantity unit)
+-- Synced with updated ERD (unit reference table + FK unit_id)
 
 BEGIN;
 
@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS meal_item CASCADE;
 DROP TABLE IF EXISTS meal CASCADE;
 DROP TABLE IF EXISTS plan CASCADE;
 DROP TABLE IF EXISTS food CASCADE;
+DROP TABLE IF EXISTS unit CASCADE;
 DROP TABLE IF EXISTS icon CASCADE;
 DROP TABLE IF EXISTS macro_log CASCADE;
 DROP TABLE IF EXISTS configuration CASCADE;
@@ -93,12 +94,26 @@ CREATE TABLE icon (
 );
 
 -- =========================
+-- unit (reference table)
+-- code examples: g, ml, pcs
+-- kind examples: mass, volume, count  (можна і українською)
+-- =========================
+CREATE TABLE unit (
+    id   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    code varchar NOT NULL UNIQUE,
+    name varchar NOT NULL,
+    kind varchar NOT NULL
+);
+
+-- =========================
 -- food (belongs to user, optional icon)
+-- per_100_unit_id: what "per_100" means (usually g)
 -- =========================
 CREATE TABLE food (
     id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id          uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     icon_id          uuid REFERENCES icon(id) ON DELETE SET NULL,
+    per_100_unit_id  uuid NOT NULL REFERENCES unit(id) ON DELETE RESTRICT,
     name             varchar NOT NULL,
     protein_per_100  numeric NOT NULL,
     carbs_per_100    numeric NOT NULL,
@@ -150,31 +165,43 @@ CREATE TABLE meal (
 
 -- =========================
 -- meal_item (M:N between meal and food)
--- quantity_value + quantity_unit (g/ml/l)
+-- quantity_value + quantity_unit_id (FK -> unit)
 -- =========================
 CREATE TABLE meal_item (
-    id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    meal_id        uuid NOT NULL REFERENCES meal(id) ON DELETE CASCADE,
-    food_id        uuid NOT NULL REFERENCES food(id) ON DELETE RESTRICT,
-    quantity_value numeric NOT NULL,
-    quantity_unit  varchar NOT NULL,
-    is_locked      boolean NOT NULL DEFAULT false,
+    id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    meal_id          uuid NOT NULL REFERENCES meal(id) ON DELETE CASCADE,
+    food_id          uuid NOT NULL REFERENCES food(id) ON DELETE RESTRICT,
+
+    quantity_value   numeric NOT NULL,
+    quantity_unit_id uuid NOT NULL REFERENCES unit(id) ON DELETE RESTRICT,
+
+    -- snapshot from food at the moment of adding
+    per_100_unit_id  uuid NOT NULL REFERENCES unit(id) ON DELETE RESTRICT,
+    protein_per_100  numeric NOT NULL,
+    carbs_per_100    numeric NOT NULL,
+    fat_per_100      numeric NOT NULL,
+    kcal_per_100     numeric NOT NULL,
+
+    is_locked        boolean NOT NULL DEFAULT false,
+
     CONSTRAINT meal_item_qty_check CHECK (quantity_value > 0),
-    CONSTRAINT meal_item_unit_check CHECK (quantity_unit IN ('g', 'ml', 'l'))
+    CONSTRAINT meal_item_snapshot_nonneg CHECK (
+        protein_per_100 >= 0 AND carbs_per_100 >= 0 AND fat_per_100 >= 0 AND kcal_per_100 >= 0
+    )
 );
+
 
 -- =========================
 -- shop_item (M:N between shop_list and food)
--- total_quantity_value + quantity_unit (g/ml/l)
+-- total_quantity_value + quantity_unit_id (FK -> unit)
 -- =========================
 CREATE TABLE shop_item (
-    id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    list_id             uuid NOT NULL REFERENCES shop_list(id) ON DELETE CASCADE,
-    food_id             uuid NOT NULL REFERENCES food(id) ON DELETE RESTRICT,
+    id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    list_id              uuid NOT NULL REFERENCES shop_list(id) ON DELETE CASCADE,
+    food_id              uuid NOT NULL REFERENCES food(id) ON DELETE RESTRICT,
     total_quantity_value numeric NOT NULL,
-    quantity_unit       varchar NOT NULL,
-    CONSTRAINT shop_item_qty_check CHECK (total_quantity_value > 0),
-    CONSTRAINT shop_item_unit_check CHECK (quantity_unit IN ('g', 'ml', 'l'))
+    quantity_unit_id     uuid NOT NULL REFERENCES unit(id) ON DELETE RESTRICT,
+    CONSTRAINT shop_item_qty_check CHECK (total_quantity_value > 0)
 );
 
 -- =========================
@@ -193,29 +220,33 @@ CREATE TABLE export (
 -- =========================
 -- Indexes
 -- =========================
-CREATE INDEX idx_profile_user_id           ON profile(user_id);
-CREATE INDEX idx_configuration_active_macro ON configuration(active_macro_id);
+CREATE INDEX idx_profile_user_id              ON profile(user_id);
+CREATE INDEX idx_configuration_active_macro    ON configuration(active_macro_id);
 
-CREATE INDEX idx_macro_user_id             ON macro(user_id);
-CREATE INDEX idx_macro_log_user_id         ON macro_log(user_id);
-CREATE INDEX idx_macro_log_macro_id        ON macro_log(macro_id);
+CREATE INDEX idx_macro_user_id                 ON macro(user_id);
+CREATE INDEX idx_macro_log_user_id             ON macro_log(user_id);
+CREATE INDEX idx_macro_log_macro_id            ON macro_log(macro_id);
 
-CREATE INDEX idx_plan_user_id              ON plan(user_id);
-CREATE INDEX idx_plan_macro_id             ON plan(macro_id);
+CREATE INDEX idx_plan_user_id                  ON plan(user_id);
+CREATE INDEX idx_plan_macro_id                 ON plan(macro_id);
 
-CREATE INDEX idx_shop_list_plan_id         ON shop_list(plan_id);
+CREATE INDEX idx_shop_list_plan_id             ON shop_list(plan_id);
 
-CREATE INDEX idx_meal_plan_id              ON meal(plan_id);
+CREATE INDEX idx_meal_plan_id                  ON meal(plan_id);
 
-CREATE INDEX idx_food_user_id              ON food(user_id);
-CREATE INDEX idx_food_icon_id              ON food(icon_id);
+CREATE INDEX idx_food_user_id                  ON food(user_id);
+CREATE INDEX idx_food_icon_id                  ON food(icon_id);
+CREATE INDEX idx_food_per_100_unit_id          ON food(per_100_unit_id);
 
-CREATE INDEX idx_meal_item_meal_id         ON meal_item(meal_id);
-CREATE INDEX idx_meal_item_food_id         ON meal_item(food_id);
+CREATE INDEX idx_meal_item_meal_id             ON meal_item(meal_id);
+CREATE INDEX idx_meal_item_food_id             ON meal_item(food_id);
+CREATE INDEX idx_meal_item_quantity_unit_id    ON meal_item(quantity_unit_id);
+CREATE INDEX idx_meal_item_per_100_unit_id ON meal_item(per_100_unit_id);
 
-CREATE INDEX idx_shop_item_list_id         ON shop_item(list_id);
-CREATE INDEX idx_shop_item_food_id         ON shop_item(food_id);
+CREATE INDEX idx_shop_item_list_id             ON shop_item(list_id);
+CREATE INDEX idx_shop_item_food_id             ON shop_item(food_id);
+CREATE INDEX idx_shop_item_quantity_unit_id    ON shop_item(quantity_unit_id);
 
-CREATE INDEX idx_export_user_id            ON export(user_id);
+CREATE INDEX idx_export_user_id                ON export(user_id);
 
 COMMIT;
