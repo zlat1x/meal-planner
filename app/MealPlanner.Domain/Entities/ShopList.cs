@@ -8,6 +8,6 @@ public class ShopList
     public DateTime CreatedAt { get; set; }
 
     public Plan Plan { get; set; } = null!;
-    public List<ShopItem> Items { get; set; } = new();
-    public List<Export> Exports { get; set; } = new();
+    public ICollection<ShopItem> Items { get; set; } = new List<ShopItem>();
+    public ICollection<Export> Exports { get; set; } = new List<Export>();
 }

@@ -12,7 +12,7 @@ public class Plan
     public User User { get; set; } = null!;
     public Macro? Macro { get; set; }
 
-    public List<Meal> Meals { get; set; } = new();
-    public List<ShopList> ShopLists { get; set; } = new();
-    public List<Export> Exports { get; set; } = new();
+    public ICollection<Meal> Meals { get; set; } = new List<Meal>();
+    public ICollection<ShopList> ShopLists { get; set; } = new List<ShopList>();
+    public ICollection<Export> Exports { get; set; } = new List<Export>();
 }

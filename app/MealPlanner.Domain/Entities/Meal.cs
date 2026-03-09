@@ -9,5 +9,5 @@ public class Meal
     public string Name { get; set; } = null!;
 
     public Plan Plan { get; set; } = null!;
-    public List<MealItem> Items { get; set; } = new();
+    public ICollection<MealItem> Items { get; set; } = new List<MealItem>();
 }

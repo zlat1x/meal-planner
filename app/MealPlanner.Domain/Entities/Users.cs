@@ -10,9 +10,9 @@ public class User
     public Profile? Profile { get; set; }
     public Configuration? Configuration { get; set; }
 
-    public List<Macro> Macros { get; set; } = new();
-    public List<MacroLog> MacroLogs { get; set; } = new();
-    public List<Food> Foods { get; set; } = new();
-    public List<Plan> Plans { get; set; } = new();
-    public List<Export> Exports { get; set; } = new();
+    public ICollection<Macro> Macros { get; set; } = new List<Macro>();
+    public ICollection<MacroLog> MacroLogs { get; set; } = new List<MacroLog>();
+    public ICollection<Food> Foods { get; set; } = new List<Food>();
+    public ICollection<Plan> Plans { get; set; } = new List<Plan>();
+    public ICollection<Export> Exports { get; set; } = new List<Export>();
 }

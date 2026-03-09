@@ -20,6 +20,6 @@ public class Food
     public Icon? Icon { get; set; }
     public Unit Per100Unit { get; set; } = null!;
 
-    public List<MealItem> MealItems { get; set; } = new();
-    public List<ShopItem> ShopItems { get; set; } = new();
+    public ICollection<MealItem> MealItems { get; set; } = new List<MealItem>();
+    public ICollection<ShopItem> ShopItems { get; set; } = new List<ShopItem>();
 }

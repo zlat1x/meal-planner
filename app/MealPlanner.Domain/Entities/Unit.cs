@@ -7,8 +7,8 @@ public class Unit
     public string Name { get; set; } = null!;
     public string Kind { get; set; } = null!;
 
-    public List<Food> FoodsPer100Unit { get; set; } = new();
-    public List<MealItem> MealItemsQuantityUnit { get; set; } = new();
-    public List<MealItem> MealItemsPer100Unit { get; set; } = new();
-    public List<ShopItem> ShopItemsQuantityUnit { get; set; } = new();
+    public ICollection<Food> FoodsPer100Unit { get; set; } = new List<Food>();
+    public ICollection<MealItem> MealItemsQuantityUnit { get; set; } = new List<MealItem>();
+    public ICollection<MealItem> MealItemsPer100Unit { get; set; } = new List<MealItem>();
+    public ICollection<ShopItem> ShopItemsQuantityUnit { get; set; } = new List<ShopItem>();
 }

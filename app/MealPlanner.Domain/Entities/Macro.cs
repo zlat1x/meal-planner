@@ -11,5 +11,5 @@ public class Macro
     public DateTime CreatedAt { get; set; }
 
     public User User { get; set; } = null!;
-    public List<Plan> Plans { get; set; } = new();
+    public ICollection<Plan> Plans { get; set; } = new List<Plan>();
 }

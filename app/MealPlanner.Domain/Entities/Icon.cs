@@ -6,5 +6,5 @@ public class Icon
     public string Code { get; set; } = null!;
     public string Emoji { get; set; } = null!;
 
-    public List<Food> Foods { get; set; } = new();
+    public ICollection<Food> Foods { get; set; } = new List<Food>();
 }
