@@ -1,0 +1,42 @@
+@model MealPlanner.Domain.Entities.ShopList
+
+@{
+    ViewData["Title"] = "Edit shop list";
+}
+
+<h1>Edit shop list</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="PlanId" class="form-label">Plan</label>
+                <select asp-for="PlanId" asp-items="ViewBag.PlanId" class="form-select">
+                    <option value="">Select plan</option>
+                </select>
+                <span asp-validation-for="PlanId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Days" class="form-label"></label>
+                <input asp-for="Days" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

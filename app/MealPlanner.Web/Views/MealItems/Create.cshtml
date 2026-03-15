@@ -1,0 +1,88 @@
+@model MealPlanner.Domain.Entities.MealItem
+
+@{
+    ViewData["Title"] = "Create meal item";
+}
+
+<h1>Create meal item</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="MealId" class="form-label">Meal</label>
+                <select asp-for="MealId" asp-items="ViewBag.MealId" class="form-select">
+                    <option value="">Select meal</option>
+                </select>
+                <span asp-validation-for="MealId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FoodId" class="form-label">Food</label>
+                <select asp-for="FoodId" asp-items="ViewBag.FoodId" class="form-select">
+                    <option value="">Select food</option>
+                </select>
+                <span asp-validation-for="FoodId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="QuantityValue" class="form-label"></label>
+                <input asp-for="QuantityValue" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="QuantityUnitId" class="form-label">Quantity unit</label>
+                <select asp-for="QuantityUnitId" asp-items="ViewBag.QuantityUnitId" class="form-select">
+                    <option value="">Select quantity unit</option>
+                </select>
+                <span asp-validation-for="QuantityUnitId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Per100UnitId" class="form-label">Per 100 unit</label>
+                <select asp-for="Per100UnitId" asp-items="ViewBag.Per100UnitId" class="form-select">
+                    <option value="">Select per 100 unit</option>
+                </select>
+                <span asp-validation-for="Per100UnitId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ProteinPer100" class="form-label"></label>
+                <input asp-for="ProteinPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CarbsPer100" class="form-label"></label>
+                <input asp-for="CarbsPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FatPer100" class="form-label"></label>
+                <input asp-for="FatPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="KcalPer100" class="form-label"></label>
+                <input asp-for="KcalPer100" class="form-control" />
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="IsLocked" class="form-check-input" />
+                <label asp-for="IsLocked" class="form-check-label"></label>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

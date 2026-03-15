@@ -1,0 +1,39 @@
+@model IEnumerable<MealPlanner.Domain.Entities.ShopList>
+
+@{
+    ViewData["Title"] = "Shop lists";
+}
+
+<h1>Shop lists</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create new shop list</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Plan user</th>
+            <th>Plan status</th>
+            <th>Days</th>
+            <th>Created at</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.Plan.User.Name</td>
+            <td>@item.Plan.Status</td>
+            <td>@item.Days</td>
+            <td>@item.CreatedAt</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

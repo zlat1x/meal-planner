@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Profiles</h5>
@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Configurations</h5>
@@ -68,7 +68,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Foods</h5>
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <div class="col-md-6 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Plans</h5>
@@ -88,12 +88,42 @@
         </div>
     </div>
 
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Meals</h5>
                 <p class="card-text">Manage meals inside plans.</p>
                 <a asp-controller="Meals" asp-action="Index" class="btn btn-primary">Open meals</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Meal items</h5>
+                <p class="card-text">Manage food items inside meals.</p>
+                <a asp-controller="MealItems" asp-action="Index" class="btn btn-primary">Open meal items</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Shop lists</h5>
+                <p class="card-text">Manage shopping lists.</p>
+                <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Open shop lists</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Shop items</h5>
+                <p class="card-text">Manage products inside shopping lists.</p>
+                <a asp-controller="ShopItems" asp-action="Index" class="btn btn-primary">Open shop items</a>
             </div>
         </div>
     </div>

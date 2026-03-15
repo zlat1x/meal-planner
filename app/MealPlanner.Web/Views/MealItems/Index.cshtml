@@ -1,0 +1,43 @@
+@model IEnumerable<MealPlanner.Domain.Entities.MealItem>
+
+@{
+    ViewData["Title"] = "Meal items";
+}
+
+<h1>Meal items</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create new meal item</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Meal</th>
+            <th>Food</th>
+            <th>Quantity</th>
+            <th>Quantity unit</th>
+            <th>Per 100 unit</th>
+            <th>Locked</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.Meal.Name</td>
+            <td>@item.Food.Name</td>
+            <td>@item.QuantityValue</td>
+            <td>@item.QuantityUnit.Name</td>
+            <td>@item.Per100Unit.Name</td>
+            <td>@item.IsLocked</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
