@@ -1,0 +1,32 @@
+@model MealPlanner.Domain.Entities.Plan
+
+@{
+    ViewData["Title"] = "Plan details";
+}
+
+<h1>Plan details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">User</dt>
+        <dd class="col-sm-10">@Model.User.Name</dd>
+
+        <dt class="col-sm-2">Macro</dt>
+        <dd class="col-sm-10">@(Model.Macro != null ? Model.Macro.Mode : "-")</dd>
+
+        <dt class="col-sm-2">Days</dt>
+        <dd class="col-sm-10">@Model.Days</dd>
+
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Model.Status</dd>
+
+        <dt class="col-sm-2">Created at</dt>
+        <dd class="col-sm-10">@Model.CreatedAt</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+</div>

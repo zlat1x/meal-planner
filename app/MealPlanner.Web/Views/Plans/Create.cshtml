@@ -1,0 +1,53 @@
+@model MealPlanner.Domain.Entities.Plan
+
+@{
+    ViewData["Title"] = "Create plan";
+}
+
+<h1>Create plan</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label">User</label>
+                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                    <option value="">Select user</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MacroId" class="form-label">Macro</label>
+                <select asp-for="MacroId" asp-items="ViewBag.MacroId" class="form-select">
+                    <option value="">No macro</option>
+                </select>
+                <span asp-validation-for="MacroId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Days" class="form-label"></label>
+                <input asp-for="Days" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

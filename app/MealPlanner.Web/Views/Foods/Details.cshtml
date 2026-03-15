@@ -1,0 +1,47 @@
+@model MealPlanner.Domain.Entities.Food
+
+@{
+    ViewData["Title"] = "Food details";
+}
+
+<h1>Food details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">User</dt>
+        <dd class="col-sm-10">@Model.User.Name</dd>
+
+        <dt class="col-sm-2">Icon</dt>
+        <dd class="col-sm-10">@(Model.Icon != null ? Model.Icon.Code : "-")</dd>
+
+        <dt class="col-sm-2">Per 100 unit</dt>
+        <dd class="col-sm-10">@Model.Per100Unit.Name</dd>
+
+        <dt class="col-sm-2">Protein</dt>
+        <dd class="col-sm-10">@Model.ProteinPer100</dd>
+
+        <dt class="col-sm-2">Carbs</dt>
+        <dd class="col-sm-10">@Model.CarbsPer100</dd>
+
+        <dt class="col-sm-2">Fat</dt>
+        <dd class="col-sm-10">@Model.FatPer100</dd>
+
+        <dt class="col-sm-2">Kcal</dt>
+        <dd class="col-sm-10">@Model.KcalPer100</dd>
+
+        <dt class="col-sm-2">Custom</dt>
+        <dd class="col-sm-10">@Model.IsCustom</dd>
+
+        <dt class="col-sm-2">Updated at</dt>
+        <dd class="col-sm-10">@Model.UpdatedAt</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+</div>

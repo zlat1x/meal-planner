@@ -1,0 +1,84 @@
+@model MealPlanner.Domain.Entities.Food
+
+@{
+    ViewData["Title"] = "Edit food";
+}
+
+<h1>Edit food</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="UpdatedAt" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label">User</label>
+                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                    <option value="">Select user</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="IconId" class="form-label">Icon</label>
+                <select asp-for="IconId" asp-items="ViewBag.IconId" class="form-select">
+                    <option value="">No icon</option>
+                </select>
+                <span asp-validation-for="IconId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Per100UnitId" class="form-label">Per 100 unit</label>
+                <select asp-for="Per100UnitId" asp-items="ViewBag.Per100UnitId" class="form-select">
+                    <option value="">Select unit</option>
+                </select>
+                <span asp-validation-for="Per100UnitId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ProteinPer100" class="form-label"></label>
+                <input asp-for="ProteinPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CarbsPer100" class="form-label"></label>
+                <input asp-for="CarbsPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FatPer100" class="form-label"></label>
+                <input asp-for="FatPer100" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="KcalPer100" class="form-label"></label>
+                <input asp-for="KcalPer100" class="form-control" />
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="IsCustom" class="form-check-input" />
+                <label asp-for="IsCustom" class="form-check-label"></label>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

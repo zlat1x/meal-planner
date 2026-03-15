@@ -1,0 +1,32 @@
+@model MealPlanner.Domain.Entities.Food
+
+@{
+    ViewData["Title"] = "Delete food";
+}
+
+<h1>Delete food</h1>
+
+<h3>Are you sure you want to delete this food?</h3>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">User</dt>
+        <dd class="col-sm-10">@Model.User.Name</dd>
+
+        <dt class="col-sm-2">Icon</dt>
+        <dd class="col-sm-10">@(Model.Icon != null ? Model.Icon.Code : "-")</dd>
+
+        <dt class="col-sm-2">Per 100 unit</dt>
+        <dd class="col-sm-10">@Model.Per100Unit.Name</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+    </form>
+</div>
