@@ -8,7 +8,7 @@
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-6 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Users</h5>
@@ -18,12 +18,52 @@
         </div>
     </div>
 
-    <div class="col-md-6 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Units</h5>
                 <p class="card-text">Manage measurement units.</p>
                 <a asp-controller="Units" asp-action="Index" class="btn btn-primary">Open units</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Icons</h5>
+                <p class="card-text">Manage food icons.</p>
+                <a asp-controller="Icons" asp-action="Index" class="btn btn-primary">Open icons</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Macros</h5>
+                <p class="card-text">Manage macro plans.</p>
+                <a asp-controller="Macros" asp-action="Index" class="btn btn-primary">Open macros</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Profiles</h5>
+                <p class="card-text">Manage user profiles.</p>
+                <a asp-controller="Profiles" asp-action="Index" class="btn btn-primary">Open profiles</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Configurations</h5>
+                <p class="card-text">Manage application settings for users.</p>
+                <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Open configurations</a>
             </div>
         </div>
     </div>

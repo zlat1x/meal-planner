@@ -1,0 +1,54 @@
+@model MealPlanner.Domain.Entities.Configuration
+
+@{
+    ViewData["Title"] = "Create configuration";
+}
+
+<h1>Create configuration</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label">User</label>
+                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                    <option value="">Select user</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Lang" class="form-label"></label>
+                <input asp-for="Lang" class="form-control" />
+                <span asp-validation-for="Lang" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MealsPerDay" class="form-label"></label>
+                <input asp-for="MealsPerDay" class="form-control" />
+                <span asp-validation-for="MealsPerDay" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ActiveMacroId" class="form-label">Active macro</label>
+                <select asp-for="ActiveMacroId" asp-items="ViewBag.ActiveMacroId" class="form-select">
+                    <option value="">No active macro</option>
+                </select>
+                <span asp-validation-for="ActiveMacroId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,58 @@
+@model MealPlanner.Domain.Entities.Macro
+
+@{
+    ViewData["Title"] = "Create macro";
+}
+
+<h1>Create macro</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label">User</label>
+                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                    <option value="">Select user</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ProteinG" class="form-label"></label>
+                <input asp-for="ProteinG" class="form-control" />
+                <span asp-validation-for="ProteinG" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CarbsG" class="form-label"></label>
+                <input asp-for="CarbsG" class="form-control" />
+                <span asp-validation-for="CarbsG" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FatG" class="form-label"></label>
+                <input asp-for="FatG" class="form-control" />
+                <span asp-validation-for="FatG" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Mode" class="form-label"></label>
+                <input asp-for="Mode" class="form-control" />
+                <span asp-validation-for="Mode" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

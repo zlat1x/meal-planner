@@ -1,0 +1,43 @@
+@model IEnumerable<MealPlanner.Domain.Entities.Macro>
+
+@{
+    ViewData["Title"] = "Macros";
+}
+
+<h1>Macros</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create new macro</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Protein</th>
+            <th>Carbs</th>
+            <th>Fat</th>
+            <th>Mode</th>
+            <th>Created at</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.User.Name</td>
+            <td>@item.ProteinG</td>
+            <td>@item.CarbsG</td>
+            <td>@item.FatG</td>
+            <td>@item.Mode</td>
+            <td>@item.CreatedAt</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

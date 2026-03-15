@@ -68,6 +68,12 @@ public class UsersController : Controller
         user.Id = Guid.NewGuid();
         user.CreatedAt = DateTime.UtcNow;
 
+        // var emailExists = await _context.Users.AnyAsync(x => x.Email == user.Email);
+        // if (emailExists)
+        // {
+        //     ModelState.AddModelError("Email", "User with this email already exists.");
+        // }
+
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -121,6 +127,12 @@ public class UsersController : Controller
         {
             return NotFound();
         }
+
+        // var emailExists = await _context.Users.AnyAsync(x => x.Email == user.Email && x.Id != user.Id);
+        // if (emailExists)
+        // {
+        //     ModelState.AddModelError("Email", "User with this email already exists.");
+        // }
 
         userFromDb.Email = user.Email;
         userFromDb.Name = user.Name;
