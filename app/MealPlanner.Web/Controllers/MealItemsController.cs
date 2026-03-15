@@ -63,6 +63,11 @@ public class MealItemsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MealItem mealItem)
     {
+        ModelState.Remove("Meal"); 
+        ModelState.Remove("Food"); 
+        ModelState.Remove("QuantityUnit");
+        ModelState.Remove("Per100Unit");
+
         await ValidateMealItemAsync(mealItem);
 
         if (!ModelState.IsValid)
@@ -101,6 +106,11 @@ public class MealItemsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, MealItem mealItem)
     {
+        ModelState.Remove("Meal"); 
+        ModelState.Remove("Food"); 
+        ModelState.Remove("QuantityUnit");
+        ModelState.Remove("Per100Unit");
+        
         if (id != mealItem.Id)
         {
             return NotFound();

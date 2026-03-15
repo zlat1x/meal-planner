@@ -1,0 +1,62 @@
+@model MealPlanner.Domain.Entities.Export
+
+@{
+    ViewData["Title"] = "Create export";
+}
+
+<h1>Create export</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label">User</label>
+                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                    <option value="">Select user</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PlanId" class="form-label">Plan</label>
+                <select asp-for="PlanId" asp-items="ViewBag.PlanId" class="form-select">
+                    <option value="">No plan</option>
+                </select>
+                <span asp-validation-for="PlanId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ListId" class="form-label">Shop list</label>
+                <select asp-for="ListId" asp-items="ViewBag.ListId" class="form-select">
+                    <option value="">No shop list</option>
+                </select>
+                <span asp-validation-for="ListId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FileUrl" class="form-label"></label>
+                <input asp-for="FileUrl" class="form-control" />
+                <span asp-validation-for="FileUrl" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

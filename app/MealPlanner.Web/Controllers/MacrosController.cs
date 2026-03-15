@@ -54,6 +54,9 @@ public class MacrosController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Macro macro)
     {
+        ModelState.Remove("User");
+        ModelState.Remove("Plans");
+
         if (string.IsNullOrWhiteSpace(macro.Mode))
         {
             ModelState.AddModelError("Mode", "Mode is required.");
@@ -102,6 +105,9 @@ public class MacrosController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Macro macro)
     {
+        ModelState.Remove("User");
+        ModelState.Remove("Plans");
+        
         if (id != macro.Id)
         {
             return NotFound();

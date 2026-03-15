@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Meals</h5>
@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Meal items</h5>
@@ -108,7 +108,7 @@
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Shop lists</h5>
@@ -118,12 +118,32 @@
         </div>
     </div>
 
-    <div class="col-md-12 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Shop items</h5>
                 <p class="card-text">Manage products inside shopping lists.</p>
                 <a asp-controller="ShopItems" asp-action="Index" class="btn btn-primary">Open shop items</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Exports</h5>
+                <p class="card-text">Manage export records.</p>
+                <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Open exports</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Macro logs</h5>
+                <p class="card-text">Manage macro change history.</p>
+                <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-primary">Open macro logs</a>
             </div>
         </div>
     </div>

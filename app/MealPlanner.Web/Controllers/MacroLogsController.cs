@@ -6,24 +6,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Web.Controllers;
 
-public class PlansController : Controller
+public class MacroLogsController : Controller
 {
     private readonly MealPlannerDbContext _context;
 
-    public PlansController(MealPlannerDbContext context)
+    public MacroLogsController(MealPlannerDbContext context)
     {
         _context = context;
     }
 
     public async Task<IActionResult> Index()
     {
-        var plans = await _context.Plans
+        var macroLogs = await _context.MacroLogs
             .Include(x => x.User)
             .Include(x => x.Macro)
-            .OrderByDescending(x => x.CreatedAt)
+            .OrderByDescending(x => x.ChangedAt)
             .ToListAsync();
 
-        return View(plans);
+        return View(macroLogs);
     }
 
     public async Task<IActionResult> Details(Guid? id)
@@ -33,17 +33,17 @@ public class PlansController : Controller
             return NotFound();
         }
 
-        var plan = await _context.Plans
+        var macroLog = await _context.MacroLogs
             .Include(x => x.User)
             .Include(x => x.Macro)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (plan == null)
+        if (macroLog == null)
         {
             return NotFound();
         }
 
-        return View(plan);
+        return View(macroLog);
     }
 
     public async Task<IActionResult> Create()
@@ -54,26 +54,23 @@ public class PlansController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Plan plan)
+    public async Task<IActionResult> Create(MacroLog macroLog)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Macro"); 
-        ModelState.Remove("Meals"); 
-        ModelState.Remove("ShopLists");
-        ModelState.Remove("Exports");
+        ModelState.Remove("User");
+        ModelState.Remove("Macro");
 
-        await ValidatePlanAsync(plan);
+        await ValidateMacroLogAsync(macroLog);
 
         if (!ModelState.IsValid)
         {
-            await LoadListsAsync(plan.UserId, plan.MacroId);
-            return View(plan);
+            await LoadListsAsync(macroLog.UserId, macroLog.MacroId);
+            return View(macroLog);
         }
 
-        plan.Id = Guid.NewGuid();
-        plan.CreatedAt = DateTime.UtcNow;
+        macroLog.Id = Guid.NewGuid();
+        macroLog.ChangedAt = DateTime.UtcNow;
 
-        _context.Plans.Add(plan);
+        _context.MacroLogs.Add(macroLog);
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
@@ -86,51 +83,51 @@ public class PlansController : Controller
             return NotFound();
         }
 
-        var plan = await _context.Plans.FindAsync(id);
+        var macroLog = await _context.MacroLogs.FindAsync(id);
 
-        if (plan == null)
+        if (macroLog == null)
         {
             return NotFound();
         }
 
-        await LoadListsAsync(plan.UserId, plan.MacroId);
-        return View(plan);
+        await LoadListsAsync(macroLog.UserId, macroLog.MacroId);
+        return View(macroLog);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, Plan plan)
+    public async Task<IActionResult> Edit(Guid id, MacroLog macroLog)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Macro"); 
-        ModelState.Remove("Meals"); 
-        ModelState.Remove("ShopLists");
-        ModelState.Remove("Exports");
+        ModelState.Remove("User");
+        ModelState.Remove("Macro");
         
-        if (id != plan.Id)
+        if (id != macroLog.Id)
         {
             return NotFound();
         }
 
-        await ValidatePlanAsync(plan);
+        await ValidateMacroLogAsync(macroLog);
 
         if (!ModelState.IsValid)
         {
-            await LoadListsAsync(plan.UserId, plan.MacroId);
-            return View(plan);
+            await LoadListsAsync(macroLog.UserId, macroLog.MacroId);
+            return View(macroLog);
         }
 
-        var planFromDb = await _context.Plans.FindAsync(id);
+        var macroLogFromDb = await _context.MacroLogs.FindAsync(id);
 
-        if (planFromDb == null)
+        if (macroLogFromDb == null)
         {
             return NotFound();
         }
 
-        planFromDb.UserId = plan.UserId;
-        planFromDb.MacroId = plan.MacroId;
-        planFromDb.Days = plan.Days;
-        planFromDb.Status = plan.Status;
+        macroLogFromDb.UserId = macroLog.UserId;
+        macroLogFromDb.MacroId = macroLog.MacroId;
+        macroLogFromDb.Event = macroLog.Event;
+        macroLogFromDb.ProteinG = macroLog.ProteinG;
+        macroLogFromDb.CarbsG = macroLog.CarbsG;
+        macroLogFromDb.FatG = macroLog.FatG;
+        macroLogFromDb.ChangedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 
@@ -144,31 +141,31 @@ public class PlansController : Controller
             return NotFound();
         }
 
-        var plan = await _context.Plans
+        var macroLog = await _context.MacroLogs
             .Include(x => x.User)
             .Include(x => x.Macro)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (plan == null)
+        if (macroLog == null)
         {
             return NotFound();
         }
 
-        return View(plan);
+        return View(macroLog);
     }
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var plan = await _context.Plans.FindAsync(id);
+        var macroLog = await _context.MacroLogs.FindAsync(id);
 
-        if (plan == null)
+        if (macroLog == null)
         {
             return NotFound();
         }
 
-        _context.Plans.Remove(plan);
+        _context.MacroLogs.Remove(macroLog);
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
@@ -176,29 +173,34 @@ public class PlansController : Controller
 
     private async Task LoadListsAsync(Guid? selectedUserId = null, Guid? selectedMacroId = null)
     {
-        var users = await _context.Users.OrderBy(x => x.Name).ToListAsync();
-        var macros = await _context.Macros.OrderBy(x => x.Mode).ToListAsync();
+        var users = await _context.Users
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+
+        var macros = await _context.Macros
+            .OrderBy(x => x.Mode)
+            .ToListAsync();
 
         ViewBag.UserId = new SelectList(users, "Id", "Name", selectedUserId);
         ViewBag.MacroId = new SelectList(macros, "Id", "Mode", selectedMacroId);
     }
 
-    private async Task ValidatePlanAsync(Plan plan)
+    private async Task ValidateMacroLogAsync(MacroLog macroLog)
     {
-        if (string.IsNullOrWhiteSpace(plan.Status))
+        if (string.IsNullOrWhiteSpace(macroLog.Event))
         {
-            ModelState.AddModelError("Status", "Status is required.");
+            ModelState.AddModelError("Event", "Event is required.");
         }
 
-        var userExists = await _context.Users.AnyAsync(x => x.Id == plan.UserId);
+        var userExists = await _context.Users.AnyAsync(x => x.Id == macroLog.UserId);
         if (!userExists)
         {
             ModelState.AddModelError("UserId", "User is required.");
         }
 
-        if (plan.MacroId.HasValue)
+        if (macroLog.MacroId.HasValue)
         {
-            var macroExists = await _context.Macros.AnyAsync(x => x.Id == plan.MacroId.Value);
+            var macroExists = await _context.Macros.AnyAsync(x => x.Id == macroLog.MacroId.Value);
             if (!macroExists)
             {
                 ModelState.AddModelError("MacroId", "Selected macro does not exist.");

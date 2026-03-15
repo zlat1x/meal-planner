@@ -60,6 +60,10 @@ public class ShopItemsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ShopItem shopItem)
     {
+        ModelState.Remove("List");
+        ModelState.Remove("Food"); 
+        ModelState.Remove("QuantityUnit");
+
         await ValidateShopItemAsync(shopItem);
 
         if (!ModelState.IsValid)
@@ -98,6 +102,10 @@ public class ShopItemsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, ShopItem shopItem)
     {
+        ModelState.Remove("List");
+        ModelState.Remove("Food"); 
+        ModelState.Remove("QuantityUnit");
+        
         if (id != shopItem.Id)
         {
             return NotFound();

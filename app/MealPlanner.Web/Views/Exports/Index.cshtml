@@ -1,0 +1,43 @@
+@model IEnumerable<MealPlanner.Domain.Entities.Export>
+
+@{
+    ViewData["Title"] = "Exports";
+}
+
+<h1>Exports</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create new export</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th>Plan</th>
+            <th>Shop list</th>
+            <th>File url</th>
+            <th>Created at</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.User.Name</td>
+            <td>@item.Type</td>
+            <td>@(item.Plan != null ? item.Plan.Status : "-")</td>
+            <td>@(item.List != null ? item.List.Days : null)</td>
+            <td>@item.FileUrl</td>
+            <td>@item.CreatedAt</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

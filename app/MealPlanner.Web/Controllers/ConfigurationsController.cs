@@ -56,6 +56,9 @@ public class ConfigurationsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Configuration configuration)
     {
+        ModelState.Remove("User");
+        ModelState.Remove("ActiveMacro");
+
         var userExists = await _context.Users.AnyAsync(x => x.Id == configuration.UserId);
         if (!userExists)
         {
@@ -112,6 +115,9 @@ public class ConfigurationsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Configuration configuration)
     {
+        ModelState.Remove("User");
+        ModelState.Remove("ActiveMacro");
+
         if (id != configuration.UserId)
         {
             return NotFound();

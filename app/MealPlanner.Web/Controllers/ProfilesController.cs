@@ -54,6 +54,8 @@ public class ProfilesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Profile profile)
     {
+        ModelState.Remove("User");
+
         var userExists = await _context.Users.AnyAsync(x => x.Id == profile.UserId);
         if (!userExists)
         {
@@ -97,6 +99,8 @@ public class ProfilesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Profile profile)
     {
+        ModelState.Remove("User");
+        
         if (id != profile.Id)
         {
             return NotFound();

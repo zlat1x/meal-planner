@@ -1,0 +1,35 @@
+@model MealPlanner.Domain.Entities.Export
+
+@{
+    ViewData["Title"] = "Export details";
+}
+
+<h1>Export details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">User</dt>
+        <dd class="col-sm-10">@Model.User.Name</dd>
+
+        <dt class="col-sm-2">Type</dt>
+        <dd class="col-sm-10">@Model.Type</dd>
+
+        <dt class="col-sm-2">Plan</dt>
+        <dd class="col-sm-10">@(Model.Plan != null ? Model.Plan.Status : "-")</dd>
+
+        <dt class="col-sm-2">Shop list</dt>
+        <dd class="col-sm-10">@(Model.List != null ? $"{Model.List.Days} days" : "-")</dd>
+
+        <dt class="col-sm-2">File url</dt>
+        <dd class="col-sm-10">@Model.FileUrl</dd>
+
+        <dt class="col-sm-2">Created at</dt>
+        <dd class="col-sm-10">@Model.CreatedAt</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+</div>

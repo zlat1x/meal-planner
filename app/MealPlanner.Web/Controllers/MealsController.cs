@@ -57,6 +57,9 @@ public class MealsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Meal meal)
     {
+        ModelState.Remove("Plan");
+        ModelState.Remove("Items");
+
         if (string.IsNullOrWhiteSpace(meal.Name))
         {
             ModelState.AddModelError("Name", "Name is required.");
@@ -104,6 +107,9 @@ public class MealsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Meal meal)
     {
+        ModelState.Remove("Plan");
+        ModelState.Remove("Items");
+        
         if (id != meal.Id)
         {
             return NotFound();

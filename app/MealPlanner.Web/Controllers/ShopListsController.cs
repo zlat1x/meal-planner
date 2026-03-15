@@ -56,6 +56,10 @@ public class ShopListsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ShopList shopList)
     {
+        ModelState.Remove("Plan"); 
+        ModelState.Remove("Items"); 
+        ModelState.Remove("Exports");
+
         var planExists = await _context.Plans.AnyAsync(x => x.Id == shopList.PlanId);
         if (!planExists)
         {
@@ -99,6 +103,10 @@ public class ShopListsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, ShopList shopList)
     {
+        ModelState.Remove("Plan"); 
+        ModelState.Remove("Items"); 
+        ModelState.Remove("Exports");
+        
         if (id != shopList.Id)
         {
             return NotFound();
