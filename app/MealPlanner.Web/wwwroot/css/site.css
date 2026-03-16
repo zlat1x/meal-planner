@@ -1,31 +1,242 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    min-height: 100vh;
+    margin: 0;
+    background: #f4f7fb;
+    color: #1f2937;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.app-navbar {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.app-navbar .navbar-brand,
+.app-navbar .nav-link,
+.app-navbar .navbar-text {
+    color: #ffffff !important;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .dropdown-item:hover {
+    transition: 0.2s ease;
+}
+
+.app-navbar-text {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.app-shell {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.app-content {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.app-footer {
+    margin-top: 2rem;
+    padding: 1rem 0 2rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+h1, h2, h3 {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.display-4 {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+}
+
+.card-title {
+    font-weight: 700;
+    color: #111827;
+}
+
+.card-text {
+    color: #6b7280;
+}
+
+.table {
+    margin-top: 1rem;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: #eaf1ff;
+    color: #1e3a8a;
+    border-bottom: none;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.btn-warning {
+    color: #ffffff;
+    background: #f59e0b;
+    border-color: #f59e0b;
+}
+
+.btn-warning:hover {
+    color: #ffffff;
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.btn-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    border-color: #6b7280;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid #cbd5e1;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #334155;
+}
+
+.text-danger {
+    font-size: 0.95rem;
+}
+
+dl.row dt {
+    font-weight: 700;
+    color: #334155;
+}
+
+dl.row dd {
+    color: #111827;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.home-hero {
+    padding: 1rem 0 2rem;
+}
+
+.home-subtitle {
+    max-width: 760px;
+    margin: 0 auto;
+    color: #64748b;
+    font-size: 1.05rem;
+}
+
+.section-title {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.info-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.dropdown-item:active {
+    background: #2563eb;
+}
+
+@media (max-width: 768px) {
+    .app-content {
+        padding: 1.2rem;
+        border-radius: 0;
+    }
+
+    .app-shell {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
 }

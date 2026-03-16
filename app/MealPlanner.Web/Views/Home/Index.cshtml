@@ -2,138 +2,149 @@
     ViewData["Title"] = "Meal Planner";
 }
 
-<div class="text-center">
+<div class="home-hero text-center">
+    <span class="info-badge">ASP.NET Core MVC project</span>
     <h1 class="display-4">Meal Planner</h1>
-    <p>ASP.NET Core MVC application for meal planning and nutrition management.</p>
+    <p class="home-subtitle">
+        A web application for managing users, food products, meal plans, shopping lists,
+        exports and nutrition history.
+    </p>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-3 mb-3">
+<h2 class="section-title">Reference data</h2>
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Users</h5>
-                <p class="card-text">Manage application users.</p>
-                <a asp-controller="Users" asp-action="Index" class="btn btn-primary">Open users</a>
+                <p class="card-text">Manage system users.</p>
+                <a asp-controller="Users" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Units</h5>
                 <p class="card-text">Manage measurement units.</p>
-                <a asp-controller="Units" asp-action="Index" class="btn btn-primary">Open units</a>
+                <a asp-controller="Units" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Icons</h5>
                 <p class="card-text">Manage food icons.</p>
-                <a asp-controller="Icons" asp-action="Index" class="btn btn-primary">Open icons</a>
+                <a asp-controller="Icons" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Macros</h5>
-                <p class="card-text">Manage macro plans.</p>
-                <a asp-controller="Macros" asp-action="Index" class="btn btn-primary">Open macros</a>
+                <p class="card-text">Manage macro targets.</p>
+                <a asp-controller="Macros" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Profiles</h5>
                 <p class="card-text">Manage user profiles.</p>
-                <a asp-controller="Profiles" asp-action="Index" class="btn btn-primary">Open profiles</a>
+                <a asp-controller="Profiles" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Configurations</h5>
-                <p class="card-text">Manage application settings.</p>
-                <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Open configurations</a>
+                <p class="card-text">Manage user settings.</p>
+                <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-3 mb-3">
+<h2 class="section-title">Planning</h2>
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Foods</h5>
-                <p class="card-text">Manage foods and nutrition values.</p>
-                <a asp-controller="Foods" asp-action="Index" class="btn btn-primary">Open foods</a>
+                <p class="card-text">Manage food items and nutrition values.</p>
+                <a asp-controller="Foods" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Plans</h5>
                 <p class="card-text">Manage meal plans.</p>
-                <a asp-controller="Plans" asp-action="Index" class="btn btn-primary">Open plans</a>
+                <a asp-controller="Plans" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Meals</h5>
                 <p class="card-text">Manage meals inside plans.</p>
-                <a asp-controller="Meals" asp-action="Index" class="btn btn-primary">Open meals</a>
+                <a asp-controller="Meals" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Meal items</h5>
-                <p class="card-text">Manage food items inside meals.</p>
-                <a asp-controller="MealItems" asp-action="Index" class="btn btn-primary">Open meal items</a>
+                <p class="card-text">Manage products inside meals.</p>
+                <a asp-controller="MealItems" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Shop lists</h5>
                 <p class="card-text">Manage shopping lists.</p>
-                <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Open shop lists</a>
+                <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Shop items</h5>
-                <p class="card-text">Manage products inside shopping lists.</p>
-                <a asp-controller="ShopItems" asp-action="Index" class="btn btn-primary">Open shop items</a>
+                <p class="card-text">Manage items inside shopping lists.</p>
+                <a asp-controller="ShopItems" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
+</div>
 
+<h2 class="section-title">History and export</h2>
+<div class="row">
     <div class="col-md-6 mb-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Exports</h5>
                 <p class="card-text">Manage export records.</p>
-                <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Open exports</a>
+                <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
@@ -142,8 +153,8 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Macro logs</h5>
-                <p class="card-text">Manage macro change history.</p>
-                <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-primary">Open macro logs</a>
+                <p class="card-text">Manage macro history.</p>
+                <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-primary">Open</a>
             </div>
         </div>
     </div>
