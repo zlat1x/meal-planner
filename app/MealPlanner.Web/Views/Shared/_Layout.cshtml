@@ -1,89 +1,98 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Meal Planner</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MealPlanner.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark app-navbar shadow-sm">
-            <div class="container">
-                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">
+        <nav class="navbar navbar-expand-xl app-navbar">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
                     Meal Planner
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Головна</a>
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="referenceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Reference data
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Користувачі
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="referenceDropdown">
-                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
-                                <li><a class="dropdown-item" asp-controller="Units" asp-action="Index">Units</a></li>
-                                <li><a class="dropdown-item" asp-controller="Icons" asp-action="Index">Icons</a></li>
-                                <li><a class="dropdown-item" asp-controller="Macros" asp-action="Index">Macros</a></li>
-                                <li><a class="dropdown-item" asp-controller="Profiles" asp-action="Index">Profiles</a></li>
-                                <li><a class="dropdown-item" asp-controller="Configurations" asp-action="Index">Configurations</a></li>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Користувачі</a></li>
+                                <li><a class="dropdown-item" asp-controller="Profiles" asp-action="Index">Профілі</a></li>
+                                <li><a class="dropdown-item" asp-controller="Configurations" asp-action="Index">Конфігурації</a></li>
                             </ul>
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="planningDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Planning
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Цілі та БЖВ
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="planningDropdown">
-                                <li><a class="dropdown-item" asp-controller="Foods" asp-action="Index">Foods</a></li>
-                                <li><a class="dropdown-item" asp-controller="Plans" asp-action="Index">Plans</a></li>
-                                <li><a class="dropdown-item" asp-controller="Meals" asp-action="Index">Meals</a></li>
-                                <li><a class="dropdown-item" asp-controller="MealItems" asp-action="Index">Meal items</a></li>
-                                <li><a class="dropdown-item" asp-controller="ShopLists" asp-action="Index">Shop lists</a></li>
-                                <li><a class="dropdown-item" asp-controller="ShopItems" asp-action="Index">Shop items</a></li>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Macros" asp-action="Index">Макроси</a></li>
+                                <li><a class="dropdown-item" asp-controller="MacroLogs" asp-action="Index">Журнал змін</a></li>
                             </ul>
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="historyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                History
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Продукти
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="historyDropdown">
-                                <li><a class="dropdown-item" asp-controller="Exports" asp-action="Index">Exports</a></li>
-                                <li><a class="dropdown-item" asp-controller="MacroLogs" asp-action="Index">Macro logs</a></li>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Foods" asp-action="Index">Продукти</a></li>
+                                <li><a class="dropdown-item" asp-controller="Icons" asp-action="Index">Іконки</a></li>
+                                <li><a class="dropdown-item" asp-controller="Units" asp-action="Index">Одиниці вимірювання</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Планування
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Plans" asp-action="Index">Плани</a></li>
+                                <li><a class="dropdown-item" asp-controller="Meals" asp-action="Index">Прийоми їжі</a></li>
+                                <li><a class="dropdown-item" asp-controller="MealItems" asp-action="Index">Позиції у плані</a></li>
+                                <li><a class="dropdown-item" asp-controller="ShopLists" asp-action="Index">Списки покупок</a></li>
+                                <li><a class="dropdown-item" asp-controller="ShopItems" asp-action="Index">Позиції списку</a></li>
+                                <li><a class="dropdown-item" asp-controller="Exports" asp-action="Index">Експорти</a></li>
                             </ul>
                         </li>
                     </ul>
 
-                    <span class="navbar-text app-navbar-text">
-                        Nutrition planning system
-                    </span>
+                    <div class="navbar-text app-navbar-text d-none d-xl-block">
+                        Вебсистема для планування харчування та контролю даних
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="app-shell">
-        <main class="container app-content">
+    <main class="container-fluid app-shell px-3 px-md-4 px-xl-5">
+        <div class="app-content">
             @RenderBody()
-        </main>
-    </div>
+        </div>
+    </main>
 
     <footer class="app-footer">
         <div class="container">
-            <span>© 2026 Meal Planner</span>
+            <div>Meal Planner · лабораторний вебпроєкт</div>
+            <div class="mt-1">Україномовний інтерфейс для керування харчуванням, планами та списками покупок</div>
         </div>
     </footer>
 
