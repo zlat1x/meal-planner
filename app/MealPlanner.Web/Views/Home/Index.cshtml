@@ -1,160 +1,330 @@
-﻿@{
-    ViewData["Title"] = "Meal Planner";
+﻿@model MealPlanner.Web.Models.HomeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Головна";
 }
 
-<div class="home-hero text-center">
-    <span class="info-badge">ASP.NET Core MVC project</span>
-    <h1 class="display-4">Meal Planner</h1>
-    <p class="home-subtitle">
-        A web application for managing users, food products, meal plans, shopping lists,
-        exports and nutrition history.
-    </p>
-</div>
+<div class="dashboard-hero">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <span class="info-badge">Meal Planner · вебдодаток</span>
+            <h1 class="display-5 mb-3">Планування харчування в одному місці</h1>
+            <p class="dashboard-lead">
+                Meal Planner допомагає керувати користувачами, цілями БЖВ, продуктами,
+                планами харчування, списками покупок та історією експортів.
+            </p>
 
-<h2 class="section-title">Reference data</h2>
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Users</h5>
-                <p class="card-text">Manage system users.</p>
-                <a asp-controller="Users" asp-action="Index" class="btn btn-primary">Open</a>
+            <div class="hero-actions">
+                <a asp-controller="Plans" asp-action="Index" class="btn btn-primary btn-lg me-2 mb-2">
+                    Відкрити плани
+                </a>
+                <a asp-controller="Foods" asp-action="Index" class="btn btn-outline-primary btn-lg mb-2">
+                    Переглянути продукти
+                </a>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Units</h5>
-                <p class="card-text">Manage measurement units.</p>
-                <a asp-controller="Units" asp-action="Index" class="btn btn-primary">Open</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Icons</h5>
-                <p class="card-text">Manage food icons.</p>
-                <a asp-controller="Icons" asp-action="Index" class="btn btn-primary">Open</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Macros</h5>
-                <p class="card-text">Manage macro targets.</p>
-                <a asp-controller="Macros" asp-action="Index" class="btn btn-primary">Open</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Profiles</h5>
-                <p class="card-text">Manage user profiles.</p>
-                <a asp-controller="Profiles" asp-action="Index" class="btn btn-primary">Open</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Configurations</h5>
-                <p class="card-text">Manage user settings.</p>
-                <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Open</a>
+        <div class="col-lg-5">
+            <div class="dashboard-highlight-card">
+                <h3 class="mb-3">Що вже реалізовано</h3>
+                <ul class="feature-list">
+                    <li>Користувачі та профілі</li>
+                    <li>Цілі БЖВ та конфігурації</li>
+                    <li>База продуктів та одиниць вимірювання</li>
+                    <li>Плани харчування та прийоми їжі</li>
+                    <li>Списки покупок та експорт</li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
-<h2 class="section-title">Planning</h2>
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card">
+<div class="stats-grid mt-4">
+    <div class="stat-card">
+        <div class="stat-label">Користувачі</div>
+        <div class="stat-value">@Model.UsersCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Продукти</div>
+        <div class="stat-value">@Model.FoodsCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Плани</div>
+        <div class="stat-value">@Model.PlansCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Списки покупок</div>
+        <div class="stat-value">@Model.ShopListsCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Експорти</div>
+        <div class="stat-value">@Model.ExportsCount</div>
+    </div>
+</div>
+
+<h2 class="section-title mt-5">Основні розділи</h2>
+<div class="row g-4">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Foods</h5>
-                <p class="card-text">Manage food items and nutrition values.</p>
-                <a asp-controller="Foods" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">Користувачі та профілі</h5>
+                <p class="card-text">
+                    Створення користувачів, ведення профілів та збереження базової інформації.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary">Користувачі</a>
+                    <a asp-controller="Profiles" asp-action="Index" class="btn btn-outline-primary">Профілі</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Plans</h5>
-                <p class="card-text">Manage meal plans.</p>
-                <a asp-controller="Plans" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">Налаштування та БЖВ</h5>
+                <p class="card-text">
+                    Конфігурації користувачів, активні цілі БЖВ та журнал змін макросів.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Конфігурації</a>
+                    <a asp-controller="Macros" asp-action="Index" class="btn btn-outline-primary">Макроси</a>
+                    <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-outline-primary">Журнал</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Meals</h5>
-                <p class="card-text">Manage meals inside plans.</p>
-                <a asp-controller="Meals" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">База продуктів</h5>
+                <p class="card-text">
+                    Керування продуктами, іконками та одиницями вимірювання.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Foods" asp-action="Index" class="btn btn-primary">Продукти</a>
+                    <a asp-controller="Icons" asp-action="Index" class="btn btn-outline-primary">Іконки</a>
+                    <a asp-controller="Units" asp-action="Index" class="btn btn-outline-primary">Одиниці</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Meal items</h5>
-                <p class="card-text">Manage products inside meals.</p>
-                <a asp-controller="MealItems" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">Плани харчування</h5>
+                <p class="card-text">
+                    Формування планів, прийомів їжі та конкретних позицій у меню.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Plans" asp-action="Index" class="btn btn-primary">Плани</a>
+                    <a asp-controller="Meals" asp-action="Index" class="btn btn-outline-primary">Прийоми їжі</a>
+                    <a asp-controller="MealItems" asp-action="Index" class="btn btn-outline-primary">Позиції</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Shop lists</h5>
-                <p class="card-text">Manage shopping lists.</p>
-                <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">Списки покупок</h5>
+                <p class="card-text">
+                    Створення списків покупок і керування товарами для закупівлі.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Списки</a>
+                    <a asp-controller="ShopItems" asp-action="Index" class="btn btn-outline-primary">Позиції</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
+    <div class="col-md-6 col-xl-4">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Shop items</h5>
-                <p class="card-text">Manage items inside shopping lists.</p>
-                <a asp-controller="ShopItems" asp-action="Index" class="btn btn-primary">Open</a>
+                <h5 class="card-title">Експорт</h5>
+                <p class="card-text">
+                    Перегляд історії експортів та доступ до збережених файлів.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Експорти</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<h2 class="section-title">History and export</h2>
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <div class="card">
+<div class="row g-4 mt-2">
+    <div class="col-xl-6">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Exports</h5>
-                <p class="card-text">Manage export records.</p>
-                <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Open</a>
+                <div class="section-header">
+                    <h3 class="mb-0">Останні плани</h3>
+                    <a asp-controller="Plans" asp-action="Index">Усі плани</a>
+                </div>
+
+                @if (Model.LatestPlans.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Статус</th>
+                                    <th>Днів</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestPlans)
+                            {
+                                <tr>
+                                    <td>@item.User.Name</td>
+                                    <td>
+                                        <span class="status-badge status-blue">@item.Status</span>
+                                    </td>
+                                    <td>@item.Days</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Поки що планів немає.</p>
+                }
             </div>
         </div>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <div class="card">
+    <div class="col-xl-6">
+        <div class="card dashboard-card">
             <div class="card-body">
-                <h5 class="card-title">Macro logs</h5>
-                <p class="card-text">Manage macro history.</p>
-                <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-primary">Open</a>
+                <div class="section-header">
+                    <h3 class="mb-0">Останні продукти</h3>
+                    <a asp-controller="Foods" asp-action="Index">Усі продукти</a>
+                </div>
+
+                @if (Model.LatestFoods.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Продукт</th>
+                                    <th>Ккал / 100</th>
+                                    <th>Одиниця</th>
+                                    <th>Оновлено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestFoods)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="me-2">@(item.Icon?.Emoji ?? "🍽️")</span>
+                                        @item.Name
+                                    </td>
+                                    <td>@item.KcalPer100</td>
+                                    <td>@item.Per100Unit.Name</td>
+                                    <td>@item.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Поки що продуктів немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="section-header">
+                    <h3 class="mb-0">Останні списки покупок</h3>
+                    <a asp-controller="ShopLists" asp-action="Index">Усі списки</a>
+                </div>
+
+                @if (Model.LatestShopLists.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Днів</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestShopLists)
+                            {
+                                <tr>
+                                    <td>@item.Plan.User.Name</td>
+                                    <td>@item.Days</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Поки що списків покупок немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="section-header">
+                    <h3 class="mb-0">Останні експорти</h3>
+                    <a asp-controller="Exports" asp-action="Index">Усі експорти</a>
+                </div>
+
+                @if (Model.LatestExports.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Тип</th>
+                                    <th>Файл</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestExports)
+                            {
+                                <tr>
+                                    <td>@item.User.Name</td>
+                                    <td>@item.Type</td>
+                                    <td class="text-break">@item.FileUrl</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Поки що експортів немає.</p>
+                }
             </div>
         </div>
     </div>
