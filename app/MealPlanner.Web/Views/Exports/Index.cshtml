@@ -1,43 +1,85 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Export>
 
 @{
-    ViewData["Title"] = "Exports";
+    ViewData["Title"] = "Експорти";
+    var items = Model.ToList();
 }
 
-<h1>Exports</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Історія експортів</h1>
+        <p class="page-subtitle">
+            Збережені експортовані файли, їх типи та прив’язка до користувачів, планів і списків покупок.
+        </p>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new export</a>
-</p>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати експорт</a>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Type</th>
-            <th>Plan</th>
-            <th>Shop list</th>
-            <th>File url</th>
-            <th>Created at</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.User.Name</td>
-            <td>@item.Type</td>
-            <td>@(item.Plan != null ? item.Plan.Status : "-")</td>
-            <td>@(item.List != null ? item.List.Days : null)</td>
-            <td>@item.FileUrl</td>
-            <td>@item.CreatedAt</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього експортів</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Типів файлів</div>
+        <div class="summary-card-value">@items.Select(x => x.Type).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">З планом</div>
+        <div class="summary-card-value">@items.Count(x => x.PlanId.HasValue)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Зі списком</div>
+        <div class="summary-card-value">@items.Count(x => x.ListId.HasValue)</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Тип</th>
+                            <th>План</th>
+                            <th>Список</th>
+                            <th>Файл</th>
+                            <th>Створено</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.User.Name</td>
+                            <td><span class="status-badge status-green">@item.Type</span></td>
+                            <td>@(item.Plan is null ? "—" : item.Plan.Status)</td>
+                            <td>@(item.List is null ? "—" : $"На {item.List.Days} днів")</td>
+                            <td class="text-break">@item.FileUrl</td>
+                            <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Експортів ще немає.</p>
+        }
+    </div>
+</div>

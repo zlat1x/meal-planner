@@ -1,41 +1,83 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Plan>
 
 @{
-    ViewData["Title"] = "Plans";
+    ViewData["Title"] = "Плани";
+    var items = Model.ToList();
 }
 
-<h1>Plans</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Плани харчування</h1>
+        <p class="page-subtitle">
+            Керування планами харчування користувачів із тривалістю, статусом і прив’язаними макросами.
+        </p>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new plan</a>
-</p>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Створити план</a>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Macro</th>
-            <th>Days</th>
-            <th>Status</th>
-            <th>Created at</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.User.Name</td>
-            <td>@(item.Macro != null ? item.Macro.Mode : "-")</td>
-            <td>@item.Days</td>
-            <td>@item.Status</td>
-            <td>@item.CreatedAt</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього планів</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Користувачів із планами</div>
+        <div class="summary-card-value">@items.Select(x => x.UserId).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Із макросами</div>
+        <div class="summary-card-value">@items.Count(x => x.MacroId.HasValue)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Середня тривалість</div>
+        <div class="summary-card-value">@(items.Any() ? Math.Round(items.Average(x => x.Days), 1) : 0)</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Статус</th>
+                            <th>Днів</th>
+                            <th>Макрос</th>
+                            <th>Створено</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.User.Name</td>
+                            <td><span class="status-badge status-blue">@item.Status</span></td>
+                            <td>@item.Days</td>
+                            <td>@(item.Macro?.Mode ?? "Не вказано")</td>
+                            <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Плани ще не створені.</p>
+        }
+    </div>
+</div>

@@ -1,41 +1,83 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Configuration>
 
 @{
-    ViewData["Title"] = "Configurations";
+    ViewData["Title"] = "Конфігурації";
+    var items = Model.ToList();
 }
 
-<h1>Configurations</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Конфігурації користувачів</h1>
+        <p class="page-subtitle">
+            Налаштування мови, кількості прийомів їжі та активної цілі БЖВ для кожного користувача.
+        </p>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new configuration</a>
-</p>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати конфігурацію</a>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Language</th>
-            <th>Meals per day</th>
-            <th>Active macro</th>
-            <th>Updated at</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.User.Name</td>
-            <td>@item.Lang</td>
-            <td>@item.MealsPerDay</td>
-            <td>@(item.ActiveMacro != null ? item.ActiveMacro.Mode : "-")</td>
-            <td>@item.UpdatedAt</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього конфігурацій</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">З активним макросом</div>
+        <div class="summary-card-value">@items.Count(x => x.ActiveMacroId.HasValue)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Мов у використанні</div>
+        <div class="summary-card-value">@items.Select(x => x.Lang).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Макс. прийомів їжі</div>
+        <div class="summary-card-value">@(items.Any() ? items.Max(x => x.MealsPerDay) : 0)</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Мова</th>
+                            <th>Прийомів їжі</th>
+                            <th>Активний макрос</th>
+                            <th>Оновлено</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.User.Name</td>
+                            <td>@item.Lang</td>
+                            <td>@item.MealsPerDay</td>
+                            <td>@(item.ActiveMacro?.Mode ?? "Не вибрано")</td>
+                            <td>@item.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Конфігурацій ще немає.</p>
+        }
+    </div>
+</div>
