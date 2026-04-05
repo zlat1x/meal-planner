@@ -37,12 +37,12 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <h2 class="h4 mb-2">Діаграма продуктів за одиницями вимірювання</h2>
+        <h2 class="h4 mb-2">Діаграма продуктів за категоріями</h2>
         <p class="text-muted mb-4">
-            На діаграмі показано, скільки продуктів у базі мають кожну одиницю вимірювання.
+            На діаграмі показано, скільки продуктів у базі належать до кожної категорії.
         </p>
 
-        <div id="foodsByUnitChart" style="width: 100%; min-height: 420px;"></div>
+        <div id="foodsByCategoryChart" style="width: 100%; min-height: 420px;"></div>
     </div>
 </div>
 
@@ -116,13 +116,13 @@
 
     <script>
         google.charts.load('current', { packages: ['corechart'] });
-        google.charts.setOnLoadCallback(drawFoodsByUnitChart);
+        google.charts.setOnLoadCallback(drawFoodsByCategoryChart);
 
-        async function drawFoodsByUnitChart() {
-            const container = document.getElementById('foodsByUnitChart');
+        async function drawFoodsByCategoryChart() {
+            const container = document.getElementById('foodsByCategoryChart');
 
             try {
-                const response = await fetch('/api/charts/foods-by-unit');
+                const response = await fetch('/api/charts/foods-by-category');
 
                 if (!response.ok) {
                     throw new Error('Не вдалося отримати дані для діаграми.');
@@ -131,16 +131,15 @@
                 const items = await response.json();
 
                 const data = new google.visualization.DataTable();
-                data.addColumn('string', 'Одиниця');
+                data.addColumn('string', 'Категорія');
                 data.addColumn('number', 'Кількість продуктів');
 
                 for (const item of items) {
-                    data.addRow([item.unitName, item.count]);
+                    data.addRow([item.categoryName, item.count]);
                 }
 
                 const options = {
-                    title: 'Кількість продуктів за одиницями вимірювання',
-                    pieHole: 0.35,
+                    title: 'Кількість продуктів за категоріями',
                     legend: { position: 'right' },
                     chartArea: {
                         left: 20,
@@ -150,7 +149,7 @@
                     }
                 };
 
-                const chart = new google.visualization.PieChart(container);
+                const chart = new google.visualization.ColumnChart(container);
                 chart.draw(data, options);
             } catch (error) {
                 console.error(error);
@@ -158,6 +157,6 @@
             }
         }
 
-        window.addEventListener('resize', drawFoodsByUnitChart);
+        window.addEventListener('resize', drawFoodsByCategoryChart);
     </script>
 }
