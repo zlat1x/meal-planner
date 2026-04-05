@@ -739,7 +739,9 @@ public class PlannerController : Controller
             FoodName = food.Name,
             Emoji = food.Icon?.Emoji ?? "🍽️",
             UnitName = food.Per100Unit.Name,
-            DisplayUnitName = displayUnitName,
+            DisplayUnitName = string.IsNullOrWhiteSpace(displayUnitName)
+                ? food.Per100Unit.Name
+                : displayUnitName,
             QuantityValue = weight,
             DisplayQuantityValue = displayQuantity,
             Protein = protein,

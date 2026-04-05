@@ -85,6 +85,27 @@ public static class MealPlannerSeed
         }
     }
 
+    private static async Task<Dictionary<string, Guid>> CreateUnits(MealPlannerDbContext context)
+    {
+        if (await context.Units.AnyAsync())
+        {
+            return await context.Units.ToDictionaryAsync(x => x.Code, x => x.Id);
+        }
+
+        var units = new List<Unit>
+        {
+            new() { Id = Guid.NewGuid(), Code = "gram", Name = "г", Kind = "weight" },
+            new() { Id = Guid.NewGuid(), Code = "ml", Name = "мл", Kind = "volume" },
+            new() { Id = Guid.NewGuid(), Code = "piece", Name = "шт", Kind = "count" },
+            new() { Id = Guid.NewGuid(), Code = "scoop", Name = "скуп", Kind = "count" }
+        };
+
+        context.Units.AddRange(units);
+        await context.SaveChangesAsync();
+
+        return units.ToDictionary(x => x.Code, x => x.Id);
+    }
+
     private static List<Icon> CreateIcons()
     {
         return new List<Icon>

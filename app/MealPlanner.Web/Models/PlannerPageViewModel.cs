@@ -74,8 +74,8 @@ public class PlannerMealResultItemViewModel
     public string FoodName { get; set; } = string.Empty;
     public string Emoji { get; set; } = "🍽️";
 
-    public string UnitName { get; set; } = "gram";
-    public string DisplayUnitName { get; set; } = "gram";
+    public string UnitName { get; set; } = string.Empty;
+    public string DisplayUnitName { get; set; } = string.Empty;
     public string Note { get; set; } = string.Empty;
 
     public decimal QuantityValue { get; set; }
@@ -95,8 +95,8 @@ public class PlannerShoppingItemViewModel
     public string FoodName { get; set; } = string.Empty;
     public string Emoji { get; set; } = "🍽️";
 
-    public string UnitName { get; set; } = "gram";
-    public string DisplayUnitName { get; set; } = "gram";
+    public string UnitName { get; set; } = string.Empty;
+    public string DisplayUnitName { get; set; } = string.Empty;
 
     public decimal TotalQuantity { get; set; }
     public decimal DisplayQuantityValue { get; set; }
