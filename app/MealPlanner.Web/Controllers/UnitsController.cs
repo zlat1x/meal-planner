@@ -52,17 +52,17 @@ public class UnitsController : Controller
     {
         if (string.IsNullOrWhiteSpace(unit.Code))
         {
-            ModelState.AddModelError("Code", "Code is required.");
+            ModelState.AddModelError("Code", "Потрібно вказати код.");
         }
 
         if (string.IsNullOrWhiteSpace(unit.Name))
         {
-            ModelState.AddModelError("Name", "Name is required.");
+            ModelState.AddModelError("Name", "Потрібно вказати назву.");
         }
 
         if (string.IsNullOrWhiteSpace(unit.Kind))
         {
-            ModelState.AddModelError("Kind", "Kind is required.");
+            ModelState.AddModelError("Kind", "Потрібно вказати тип.");
         }
 
         if (!ModelState.IsValid)
@@ -106,17 +106,17 @@ public class UnitsController : Controller
 
         if (string.IsNullOrWhiteSpace(unit.Code))
         {
-            ModelState.AddModelError("Code", "Code is required.");
+            ModelState.AddModelError("Code", "Потрібно вказати код.");
         }
 
         if (string.IsNullOrWhiteSpace(unit.Name))
         {
-            ModelState.AddModelError("Name", "Name is required.");
+            ModelState.AddModelError("Name", "Потрібно вказати назву.");
         }
 
         if (string.IsNullOrWhiteSpace(unit.Kind))
         {
-            ModelState.AddModelError("Kind", "Kind is required.");
+            ModelState.AddModelError("Kind", "Потрібно вказати тип.");
         }
 
         if (!ModelState.IsValid)

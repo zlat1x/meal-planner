@@ -59,13 +59,13 @@ public class MacrosController : Controller
 
         if (string.IsNullOrWhiteSpace(macro.Mode))
         {
-            ModelState.AddModelError("Mode", "Mode is required.");
+            ModelState.AddModelError("Mode", "Потрібно вказати режим.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == macro.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (!ModelState.IsValid)
@@ -107,7 +107,7 @@ public class MacrosController : Controller
     {
         ModelState.Remove("User");
         ModelState.Remove("Plans");
-        
+
         if (id != macro.Id)
         {
             return NotFound();
@@ -115,13 +115,13 @@ public class MacrosController : Controller
 
         if (string.IsNullOrWhiteSpace(macro.Mode))
         {
-            ModelState.AddModelError("Mode", "Mode is required.");
+            ModelState.AddModelError("Mode", "Потрібно вказати режим.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == macro.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (!ModelState.IsValid)

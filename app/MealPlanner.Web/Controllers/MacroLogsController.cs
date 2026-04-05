@@ -100,7 +100,7 @@ public class MacroLogsController : Controller
     {
         ModelState.Remove("User");
         ModelState.Remove("Macro");
-        
+
         if (id != macroLog.Id)
         {
             return NotFound();
@@ -189,13 +189,13 @@ public class MacroLogsController : Controller
     {
         if (string.IsNullOrWhiteSpace(macroLog.Event))
         {
-            ModelState.AddModelError("Event", "Event is required.");
+            ModelState.AddModelError("Event", "Потрібно вказати подію.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == macroLog.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (macroLog.MacroId.HasValue)
@@ -203,7 +203,7 @@ public class MacroLogsController : Controller
             var macroExists = await _context.Macros.AnyAsync(x => x.Id == macroLog.MacroId.Value);
             if (!macroExists)
             {
-                ModelState.AddModelError("MacroId", "Selected macro does not exist.");
+                ModelState.AddModelError("MacroId", "Вибраний макрос не існує.");
             }
         }
     }

@@ -59,7 +59,7 @@ public class ProfilesController : Controller
         var userExists = await _context.Users.AnyAsync(x => x.Id == profile.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (!ModelState.IsValid)
@@ -100,7 +100,7 @@ public class ProfilesController : Controller
     public async Task<IActionResult> Edit(Guid id, Profile profile)
     {
         ModelState.Remove("User");
-        
+
         if (id != profile.Id)
         {
             return NotFound();
@@ -109,7 +109,7 @@ public class ProfilesController : Controller
         var userExists = await _context.Users.AnyAsync(x => x.Id == profile.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (!ModelState.IsValid)

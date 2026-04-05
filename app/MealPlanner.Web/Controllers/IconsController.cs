@@ -51,12 +51,12 @@ public class IconsController : Controller
     {
         if (string.IsNullOrWhiteSpace(icon.Code))
         {
-            ModelState.AddModelError("Code", "Code is required.");
+            ModelState.AddModelError("Code", "Потрібно вказати код.");
         }
 
         if (string.IsNullOrWhiteSpace(icon.Emoji))
         {
-            ModelState.AddModelError("Emoji", "Emoji is required.");
+            ModelState.AddModelError("Emoji", "Потрібно вказати емодзі.");
         }
 
         if (!ModelState.IsValid)
@@ -100,12 +100,12 @@ public class IconsController : Controller
 
         if (string.IsNullOrWhiteSpace(icon.Code))
         {
-            ModelState.AddModelError("Code", "Code is required.");
+            ModelState.AddModelError("Code", "Потрібно вказати код.");
         }
 
         if (string.IsNullOrWhiteSpace(icon.Emoji))
         {
-            ModelState.AddModelError("Emoji", "Emoji is required.");
+            ModelState.AddModelError("Emoji", "Потрібно вказати емодзі.");
         }
 
         if (!ModelState.IsValid)
