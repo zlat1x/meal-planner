@@ -4,258 +4,258 @@
     ViewData["Title"] = "Конструктор меню";
 }
 
-<div class="planner-hero mb-4">
-    <div class="planner-hero-content">
-        <span class="info-badge">Meal Planner</span>
-        <h1 class="display-5 mb-3">Конструктор меню</h1>
-        <p class="planner-hero-text">
-            Склади свій раціон на кілька днів: обери кількість прийомів їжі, продукти та ціль БЖВ.
-            Система розрахує меню, підсумки по макросах і сформує список покупок.
-        </p>
+<div class="planner-page" data-planner-root>
+    <div class="planner-hero mb-4">
+        <div class="planner-hero-content">
+            <span class="info-badge">Meal Planner</span>
+            <h1 class="display-5 mb-3">Конструктор меню</h1>
+            <p class="planner-hero-text">
+                Склади свій раціон під ціль БЖВ, обери 2, 3 або 4 прийоми їжі
+                та отримай готовий список продуктів і покупок.
+            </p>
+        </div>
     </div>
-</div>
 
-@if (ViewBag.PlannerSuccess != null)
-{
-    <div class="alert alert-success mb-4">
-        @ViewBag.PlannerSuccess
-    </div>
-}
+    @if (ViewBag.PlannerSuccess != null)
+    {
+        <div class="alert alert-success mb-4">
+            @ViewBag.PlannerSuccess
+        </div>
+    }
 
-<div class="card planner-main-card mb-4">
-    <div class="card-body">
-        <form asp-controller="Planner" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="card planner-main-card mb-4">
+        <div class="card-body">
+            <form asp-controller="Planner" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="planner-top-grid mb-4">
-                <div class="planner-top-box">
-                    <label asp-for="MealsPerDay" class="form-label">Прийомів їжі</label>
-                    <select asp-for="MealsPerDay" class="form-select">
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                    </select>
+                <input asp-for="MealsPerDay" type="hidden" id="MealsPerDay" />
+
+                <div class="planner-config-wrap mb-4">
+                    <div class="planner-config-left">
+                        <div class="planner-config-card">
+                            <div class="planner-config-title">Кількість прийомів</div>
+
+                            <div class="meal-count-switch">
+                                <button type="button" class="meal-count-btn" data-meal-count="2">2 прийоми</button>
+                                <button type="button" class="meal-count-btn" data-meal-count="3">3 прийоми</button>
+                                <button type="button" class="meal-count-btn" data-meal-count="4">4 прийоми</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="planner-config-right">
+                        <div class="planner-config-card planner-config-card-action">
+                            <div class="planner-config-title">Мої цілі</div>
+
+                            <button type="submit" asp-action="LoadDefaults" class="btn btn-outline-primary w-100">
+                                Підтягнути мої цілі БЖВ
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="planner-top-box">
-                    <label asp-for="Days" class="form-label">Днів</label>
-                    <select asp-for="Days" class="form-select">
-                        <option value="1">1</option>
-                        <option value="3">3</option>
-                        <option value="5">5</option>
-                        <option value="7">7</option>
-                    </select>
+                <div class="planner-target-card mb-4">
+                    <div class="section-header mb-3">
+                        <h3 class="mb-0">Твоя ціль (БЖВ)</h3>
+                        <span class="planner-section-note">На 1 день</span>
+                    </div>
+
+                    <div class="planner-macro-grid">
+                        <div class="planner-macro-box planner-macro-box-protein">
+                            <label asp-for="ProteinTarget" class="form-label">Білки</label>
+                            <input asp-for="ProteinTarget" class="form-control planner-macro-input" />
+                            <span asp-validation-for="ProteinTarget" class="text-danger"></span>
+                        </div>
+
+                        <div class="planner-macro-box planner-macro-box-fat">
+                            <label asp-for="FatTarget" class="form-label">Жири</label>
+                            <input asp-for="FatTarget" class="form-control planner-macro-input" />
+                            <span asp-validation-for="FatTarget" class="text-danger"></span>
+                        </div>
+
+                        <div class="planner-macro-box planner-macro-box-carb">
+                            <label asp-for="CarbTarget" class="form-label">Вуглеводи</label>
+                            <input asp-for="CarbTarget" class="form-control planner-macro-input" />
+                            <span asp-validation-for="CarbTarget" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="planner-top-box planner-top-box-wide">
-                    <label class="form-label d-block">&nbsp;</label>
-                    <button type="submit" asp-action="LoadDefaults" class="btn btn-outline-primary w-100">
-                        Підтягнути мої цілі БЖВ
-                    </button>
-                </div>
-            </div>
-
-            <div class="planner-target-card mb-4">
                 <div class="section-header mb-3">
-                    <h3 class="mb-0">Ціль БЖВ</h3>
-                    <span class="planner-section-note">На день</span>
+                    <h2 class="mb-0">Прийоми їжі</h2>
+                    <span class="planner-section-note">Обери продукти для кожного прийому</span>
                 </div>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label asp-for="ProteinTarget" class="form-label">Білки</label>
-                        <input asp-for="ProteinTarget" class="form-control" />
-                        <span asp-validation-for="ProteinTarget" class="text-danger"></span>
-                    </div>
+                <div class="planner-meals-grid">
+                    @for (var i = 0; i < Model.Meals.Count; i++)
+                    {
+                        <div class="planner-meal-shell" data-meal-card data-meal-no="@Model.Meals[i].MealNo">
+                            <div class="card planner-meal-card h-100">
+                                <div class="card-body">
+                                    <input asp-for="Meals[@i].MealNo" type="hidden" />
 
-                    <div class="col-md-4">
-                        <label asp-for="FatTarget" class="form-label">Жири</label>
-                        <input asp-for="FatTarget" class="form-control" />
-                        <span asp-validation-for="FatTarget" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="CarbTarget" class="form-label">Вуглеводи</label>
-                        <input asp-for="CarbTarget" class="form-control" />
-                        <span asp-validation-for="CarbTarget" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-header mb-3">
-                <h3 class="mb-0">Прийоми їжі</h3>
-                <span class="planner-section-note">Оберіть продукти для кожного прийому</span>
-            </div>
-
-            <div class="row g-4">
-                @for (var i = 0; i < Model.Meals.Count; i++)
-                {
-                    <div class="col-xl-6">
-                        <div class="card planner-meal-card h-100">
-                            <div class="card-body">
-                                <input asp-for="Meals[@i].MealNo" type="hidden" />
-
-                                <div class="section-header mb-3">
-                                    <h4 class="mb-0">Прийом @Model.Meals[i].MealNo</h4>
-                                    <span class="status-badge status-blue">Меню</span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="Meals[@i].MealName" class="form-label">Назва прийому</label>
-                                    <input asp-for="Meals[@i].MealName" class="form-control" />
-                                    <span asp-validation-for="Meals[@i].MealName" class="text-danger"></span>
-                                </div>
-
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label asp-for="Meals[@i].ProteinFoodId" class="form-label">Білковий продукт</label>
-                                        <select asp-for="Meals[@i].ProteinFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                            <option value="">Не вибрано</option>
-                                        </select>
+                                    <div class="section-header mb-3">
+                                        <h3 class="mb-0">Прийом @Model.Meals[i].MealNo</h3>
+                                        <span class="status-badge status-blue">Меню</span>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label asp-for="Meals[@i].CarbFoodId" class="form-label">Вуглеводний продукт</label>
-                                        <select asp-for="Meals[@i].CarbFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                            <option value="">Не вибрано</option>
-                                        </select>
+                                    <div class="mb-3">
+                                        <label asp-for="Meals[@i].MealName" class="form-label">Назва прийому</label>
+                                        <input asp-for="Meals[@i].MealName" class="form-control" />
+                                        <span asp-validation-for="Meals[@i].MealName" class="text-danger"></span>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label asp-for="Meals[@i].FatFoodId" class="form-label">Жировий продукт</label>
-                                        <select asp-for="Meals[@i].FatFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                            <option value="">Не вибрано</option>
-                                        </select>
+                                    <div class="planner-food-role-grid">
+                                        <div class="planner-food-role-box">
+                                            <div class="planner-food-role-title">Білковий продукт</div>
+                                            <select asp-for="Meals[@i].ProteinFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                                <option value="">Не вибрано</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="planner-food-role-box">
+                                            <div class="planner-food-role-title">Вуглеводний продукт</div>
+                                            <select asp-for="Meals[@i].CarbFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                                <option value="">Не вибрано</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="planner-food-role-box">
+                                            <div class="planner-food-role-title">Жировий продукт</div>
+                                            <select asp-for="Meals[@i].FatFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                                <option value="">Не вибрано</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    }
+                </div>
+
+                <div class="planner-action-panel mt-4">
+                    <div class="planner-days-box">
+                        <label asp-for="Days" class="form-label">Список покупок на</label>
+                        <select asp-for="Days" class="form-select">
+                            <option value="1">1 день</option>
+                            <option value="3">3 дні</option>
+                            <option value="5">5 днів</option>
+                            <option value="7">7 днів</option>
+                        </select>
                     </div>
-                }
-            </div>
 
-            <div class="d-flex gap-2 flex-wrap mt-4">
-                <button type="submit" asp-action="Calculate" class="btn btn-primary btn-lg">
-                    Розрахувати меню
-                </button>
+                    <div class="planner-action-buttons">
+                        <button type="submit" asp-action="Calculate" class="btn btn-primary btn-lg">
+                            Розрахувати меню
+                        </button>
 
-                <button type="submit" asp-action="Save" class="btn btn-success btn-lg">
-                    Зберегти план і список покупок
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if (Model.HasResult)
-{
-    <div class="planner-summary-wrap mb-4">
-        <div class="summary-grid mb-0">
-            <div class="summary-card planner-summary-card">
-                <div class="summary-card-title">Білки</div>
-                <div class="summary-card-value">@Model.ActualProtein / @Model.ProteinTarget</div>
-            </div>
-
-            <div class="summary-card planner-summary-card">
-                <div class="summary-card-title">Жири</div>
-                <div class="summary-card-value">@Model.ActualFat / @Model.FatTarget</div>
-            </div>
-
-            <div class="summary-card planner-summary-card">
-                <div class="summary-card-title">Вуглеводи</div>
-                <div class="summary-card-value">@Model.ActualCarb / @Model.CarbTarget</div>
-            </div>
-
-            <div class="summary-card planner-summary-card">
-                <div class="summary-card-title">Калорії</div>
-                <div class="summary-card-value">@Model.ActualKcal</div>
-            </div>
+                        <button type="submit" asp-action="Save" class="btn btn-success btn-lg">
+                            Зберегти план і список покупок
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class="section-header mb-3">
-        <h2 class="mb-0">Результат меню</h2>
-        <span class="planner-section-note">Готовий варіант на 1 день</span>
-    </div>
+    @if (Model.HasResult)
+    {
+        <div class="planner-summary-wrap mb-4">
+            <div class="planner-result-summary-grid">
+                <div class="planner-result-summary-card planner-result-summary-card-protein">
+                    <div class="planner-result-summary-title">Білки</div>
+                    <div class="planner-result-summary-value">@Model.ActualProtein / @Model.ProteinTarget</div>
+                </div>
 
-    <div class="row g-4">
-        @foreach (var meal in Model.ResultMeals)
-        {
-            <div class="col-lg-6">
-                <div class="card planner-result-card h-100">
-                    <div class="card-body">
-                        <div class="section-header">
-                            <h3 class="mb-0">@meal.MealName</h3>
-                            <span class="status-badge status-blue">Прийом @meal.MealNo</span>
-                        </div>
+                <div class="planner-result-summary-card planner-result-summary-card-fat">
+                    <div class="planner-result-summary-title">Жири</div>
+                    <div class="planner-result-summary-value">@Model.ActualFat / @Model.FatTarget</div>
+                </div>
 
-                        <ul class="planner-result-list mt-3">
-                            @foreach (var item in meal.Items)
-                            {
-                                <li>
-                                    <div>
-                                        <strong>@item.Emoji @item.FoodName</strong>: @item.QuantityValue @item.UnitName
-                                        <div class="data-note">
-                                            @item.RoleName · Б @item.Protein / Ж @item.Fat / В @item.Carb / @item.Kcal ккал
+                <div class="planner-result-summary-card planner-result-summary-card-carb">
+                    <div class="planner-result-summary-title">Вуглеводи</div>
+                    <div class="planner-result-summary-value">@Model.ActualCarb / @Model.CarbTarget</div>
+                </div>
+
+                <div class="planner-result-summary-card">
+                    <div class="planner-result-summary-title">Калорії</div>
+                    <div class="planner-result-summary-value">@Model.ActualKcal</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header mb-3">
+            <h2 class="mb-0">Готове меню</h2>
+            <span class="planner-section-note">На 1 день</span>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var meal in Model.ResultMeals)
+            {
+                <div class="col-lg-6">
+                    <div class="card planner-result-card h-100">
+                        <div class="card-body">
+                            <div class="section-header">
+                                <h3 class="mb-0">@meal.MealName</h3>
+                                <span class="status-badge status-blue">Прийом @meal.MealNo</span>
+                            </div>
+
+                            <ul class="planner-result-list mt-3">
+                                @foreach (var item in meal.Items)
+                                {
+                                    <li>
+                                        <div>
+                                            <strong>@item.Emoji @item.FoodName</strong>: @item.QuantityValue @item.UnitName
+                                            <div class="data-note">
+                                                @item.RoleName · Б @item.Protein / Ж @item.Fat / В @item.Carb / @item.Kcal ккал
+                                            </div>
+
+                                            @if (!string.IsNullOrWhiteSpace(item.Note))
+                                            {
+                                                <div class="text-danger mt-1">@item.Note</div>
+                                            }
                                         </div>
+                                    </li>
+                                }
+                            </ul>
 
-                                        @if (!string.IsNullOrWhiteSpace(item.Note))
-                                        {
-                                            <div class="text-danger mt-1">@item.Note</div>
-                                        }
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-
-                        <div class="planner-totals mt-3">
-                            Разом: Б @meal.ProteinTotal / Ж @meal.FatTotal / В @meal.CarbTotal / @meal.KcalTotal ккал
+                            <div class="planner-totals mt-3">
+                                Разом: Б @meal.ProteinTotal / Ж @meal.FatTotal / В @meal.CarbTotal / @meal.KcalTotal ккал
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
 
-    <div class="section-header mt-5 mb-3">
-        <h2 class="mb-0">Список покупок</h2>
-        <span class="planner-section-note">На @Model.Days дн.</span>
-    </div>
+        <div class="section-header mt-5 mb-3">
+            <h2 class="mb-0">Список покупок</h2>
+            <span class="planner-section-note">На @Model.Days дн.</span>
+        </div>
 
-    <div class="card planner-shopping-card">
-        <div class="card-body">
-            @if (Model.ShoppingItems.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr>
-                                <th>Продукт</th>
-                                <th>Кількість</th>
-                                <th>Одиниця</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+        <div class="card planner-shopping-card">
+            <div class="card-body">
+                @if (Model.ShoppingItems.Any())
+                {
+                    <div class="planner-shopping-list">
                         @foreach (var item in Model.ShoppingItems)
                         {
-                            <tr>
-                                <td>@item.Emoji @item.FoodName</td>
-                                <td>@decimal.Round(item.TotalQuantity, 0)</td>
-                                <td>@item.UnitName</td>
-                            </tr>
+                            <div class="planner-shopping-row">
+                                <div class="planner-shopping-name">@item.Emoji @item.FoodName</div>
+                                <div class="planner-shopping-qty">@decimal.Round(item.TotalQuantity, 0) @item.UnitName</div>
+                            </div>
                         }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <p class="empty-state">Список покупок поки що порожній.</p>
-            }
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Список покупок поки що порожній.</p>
+                }
+            </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 @section Scripts {
     @{

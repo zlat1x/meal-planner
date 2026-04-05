@@ -159,17 +159,12 @@ public class PlannerController : Controller
 
         model.Meals ??= new List<PlannerMealInputViewModel>();
 
-        while (model.Meals.Count < model.MealsPerDay)
+        while (model.Meals.Count < 4)
         {
             model.Meals.Add(new PlannerMealInputViewModel());
         }
 
-        while (model.Meals.Count > model.MealsPerDay)
-        {
-            model.Meals.RemoveAt(model.Meals.Count - 1);
-        }
-
-        for (var i = 0; i < model.Meals.Count; i++)
+        for (var i = 0; i < 4; i++)
         {
             model.Meals[i].MealNo = i + 1;
 
@@ -178,6 +173,14 @@ public class PlannerController : Controller
                 model.Meals[i].MealName = $"Прийом {i + 1}";
             }
         }
+    }
+
+    private List<PlannerMealInputViewModel> GetActiveMeals(PlannerPageViewModel model)
+    {
+        return model.Meals
+            .OrderBy(x => x.MealNo)
+            .Take(model.MealsPerDay)
+            .ToList();
     }
 
     private async Task ApplyUserDefaultsAsync(PlannerPageViewModel model)
@@ -201,7 +204,7 @@ public class PlannerController : Controller
 
         if (configuration.MealsPerDay > 0)
         {
-            model.MealsPerDay = configuration.MealsPerDay;
+            model.MealsPerDay = Math.Clamp(configuration.MealsPerDay, 2, 4);
         }
 
         if (configuration.ActiveMacro != null)
@@ -236,20 +239,24 @@ public class PlannerController : Controller
             ModelState.AddModelError("FatTarget", "Потрібно вказати ціль по жирах.");
         }
 
-        for (var i = 0; i < model.Meals.Count; i++)
+        var activeMeals = GetActiveMeals(model);
+
+        for (var i = 0; i < activeMeals.Count; i++)
         {
-            var meal = model.Meals[i];
+            var meal = activeMeals[i];
 
             if (!meal.ProteinFoodId.HasValue && !meal.CarbFoodId.HasValue && !meal.FatFoodId.HasValue)
             {
-                ModelState.AddModelError($"Meals[{i}].MealName", $"Для прийому {i + 1} потрібно вибрати хоча б один продукт.");
+                ModelState.AddModelError($"Meals[{meal.MealNo - 1}].MealName", $"Для прийому {meal.MealNo} потрібно вибрати хоча б один продукт.");
             }
         }
     }
 
     private async Task BuildResultAsync(PlannerPageViewModel model)
     {
-        var foodIds = model.Meals
+        var activeMeals = GetActiveMeals(model);
+
+        var foodIds = activeMeals
             .SelectMany(x => new[] { x.ProteinFoodId, x.CarbFoodId, x.FatFoodId })
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
@@ -271,11 +278,11 @@ public class PlannerController : Controller
         model.ActualFat = 0;
         model.ActualKcal = 0;
 
-        var proteinPerMeal = model.ProteinTarget / model.Meals.Count;
-        var carbPerMeal = model.CarbTarget / model.Meals.Count;
-        var fatPerMeal = model.FatTarget / model.Meals.Count;
+        var proteinPerMeal = model.ProteinTarget / activeMeals.Count;
+        var carbPerMeal = model.CarbTarget / activeMeals.Count;
+        var fatPerMeal = model.FatTarget / activeMeals.Count;
 
-        foreach (var mealInput in model.Meals)
+        foreach (var mealInput in activeMeals)
         {
             var mealResult = new PlannerMealResultViewModel
             {
