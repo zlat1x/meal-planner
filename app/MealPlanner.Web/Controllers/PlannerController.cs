@@ -566,6 +566,8 @@ public class PlannerController : Controller
             model.ResultMeals.Add(mealResult);
         }
 
+        AdjustResultMacros(model, mealsTemp, proteinSlotData, foods, fatOverkill);
+
         BuildShoppingList(model);
 
         model.ActualProtein = decimal.Round(model.ActualProtein, 1);
@@ -575,6 +577,201 @@ public class PlannerController : Controller
         model.ExportText = BuildExportText(model);
         model.HasResult = true;
     }
+
+
+    private void AdjustResultMacros(
+        PlannerPageViewModel model,
+        List<MealTempData> mealsTemp,
+        List<ProteinSlotData> proteinSlotData,
+        Dictionary<Guid, Food> foods,
+        bool fatOverkill)
+    {
+        AdjustProteinResult(model, mealsTemp, proteinSlotData, foods);
+        RecalculateResultTotals(model);
+
+        AdjustCarbResult(model, mealsTemp, foods);
+        RecalculateResultTotals(model);
+
+        if (!fatOverkill)
+        {
+            AdjustFatResult(model, mealsTemp, foods);
+            RecalculateResultTotals(model);
+        }
+    }
+
+    private void AdjustProteinResult(
+        PlannerPageViewModel model,
+        List<MealTempData> mealsTemp,
+        List<ProteinSlotData> proteinSlotData,
+        Dictionary<Guid, Food> foods)
+    {
+        var proteinDiff = model.ProteinTarget - model.ActualProtein;
+
+        if (decimal.Abs(proteinDiff) < 0.5m)
+        {
+            return;
+        }
+
+        for (var index = model.ResultMeals.Count - 1; index >= 0; index--)
+        {
+            if (proteinSlotData[index].Type != ProteinSlotType.Dynamic)
+            {
+                continue;
+            }
+
+            var item = model.ResultMeals[index].Items
+                .LastOrDefault(x => x.RoleName == "Білковий продукт" && x.FoodId.HasValue);
+
+            if (item == null)
+            {
+                continue;
+            }
+
+            var food = GetFood(foods, item.FoodId);
+
+            if (food == null || food.ProteinPer100 <= 0)
+            {
+                continue;
+            }
+
+            ApplyMacroDiffToItem(item, food, proteinDiff, food.ProteinPer100);
+            return;
+        }
+    }
+
+    private void AdjustCarbResult(
+        PlannerPageViewModel model,
+        List<MealTempData> mealsTemp,
+        Dictionary<Guid, Food> foods)
+    {
+        var carbDiff = model.CarbTarget - model.ActualCarb;
+
+        if (decimal.Abs(carbDiff) < 0.5m)
+        {
+            return;
+        }
+
+        for (var index = model.ResultMeals.Count - 1; index >= 0; index--)
+        {
+            if (mealsTemp[index].CarbItem == null)
+            {
+                continue;
+            }
+
+            var item = model.ResultMeals[index].Items
+                .LastOrDefault(x => x.RoleName == "Вуглеводний продукт" && x.FoodId.HasValue);
+
+            if (item == null)
+            {
+                continue;
+            }
+
+            var food = GetFood(foods, item.FoodId);
+
+            if (food == null || food.CarbsPer100 <= 0)
+            {
+                continue;
+            }
+
+            ApplyMacroDiffToItem(item, food, carbDiff, food.CarbsPer100);
+            return;
+        }
+    }
+
+    private void AdjustFatResult(
+        PlannerPageViewModel model,
+        List<MealTempData> mealsTemp,
+        Dictionary<Guid, Food> foods)
+    {
+        var fatDiff = model.FatTarget - model.ActualFat;
+
+        if (decimal.Abs(fatDiff) < 0.5m)
+        {
+            return;
+        }
+
+        for (var index = model.ResultMeals.Count - 1; index >= 0; index--)
+        {
+            if (mealsTemp[index].FatFood == null || IsEmptyFood(mealsTemp[index].FatFood!))
+            {
+                continue;
+            }
+
+            var item = model.ResultMeals[index].Items
+                .LastOrDefault(x => x.RoleName == "Жировий продукт" && x.FoodId.HasValue);
+
+            if (item == null)
+            {
+                continue;
+            }
+
+            var food = GetFood(foods, item.FoodId);
+
+            if (food == null || food.FatPer100 <= 0)
+            {
+                continue;
+            }
+
+            ApplyMacroDiffToItem(item, food, fatDiff, food.FatPer100);
+            return;
+        }
+    }
+
+    private void ApplyMacroDiffToItem(
+        PlannerMealResultItemViewModel item,
+        Food food,
+        decimal diff,
+        decimal macroPer100)
+    {
+        if (macroPer100 <= 0)
+        {
+            return;
+        }
+
+        var weightDelta = decimal.Round(diff / macroPer100 * 100m, 0, MidpointRounding.AwayFromZero);
+        var newWeight = item.QuantityValue + weightDelta;
+
+        if (newWeight < 0)
+        {
+            newWeight = 0;
+        }
+
+        item.QuantityValue = newWeight;
+        item.DisplayQuantityValue = newWeight;
+        item.DisplayUnitName = food.Per100Unit.Name;
+        item.UnitName = food.Per100Unit.Name;
+        item.Protein = CalcMacro(newWeight, food.ProteinPer100);
+        item.Carb = CalcMacro(newWeight, food.CarbsPer100);
+        item.Fat = CalcMacro(newWeight, food.FatPer100);
+        item.Kcal = CalcMacro(newWeight, food.KcalPer100);
+    }
+
+    private void RecalculateResultTotals(PlannerPageViewModel model)
+    {
+        model.ActualProtein = 0;
+        model.ActualCarb = 0;
+        model.ActualFat = 0;
+        model.ActualKcal = 0;
+
+        foreach (var meal in model.ResultMeals)
+        {
+            meal.ProteinTotal = decimal.Round(meal.Items.Sum(x => x.Protein), 1);
+            meal.CarbTotal = decimal.Round(meal.Items.Sum(x => x.Carb), 1);
+            meal.FatTotal = decimal.Round(meal.Items.Sum(x => x.Fat), 1);
+            meal.KcalTotal = decimal.Round(meal.Items.Sum(x => x.Kcal), 0);
+
+            model.ActualProtein += meal.ProteinTotal;
+            model.ActualCarb += meal.CarbTotal;
+            model.ActualFat += meal.FatTotal;
+            model.ActualKcal += meal.KcalTotal;
+        }
+
+        model.ActualProtein = decimal.Round(model.ActualProtein, 1);
+        model.ActualCarb = decimal.Round(model.ActualCarb, 1);
+        model.ActualFat = decimal.Round(model.ActualFat, 1);
+        model.ActualKcal = decimal.Round(model.ActualKcal, 0);
+    }
+
 
     private void BuildShoppingList(PlannerPageViewModel model)
     {
