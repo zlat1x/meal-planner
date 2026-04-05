@@ -921,3 +921,15 @@ a:hover {
         min-height: 54px;
     }
 }
+
+.planner-export-card {
+    border-radius: 18px;
+}
+
+.planner-export-textarea {
+    min-height: 260px;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.96rem;
+    line-height: 1.5;
+}

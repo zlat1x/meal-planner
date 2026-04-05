@@ -3,16 +3,20 @@ using MealPlanner.Infrastructure.Data;
 using MealPlanner.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Hosting;
 
 namespace MealPlanner.Web.Controllers;
 
 public class PlannerController : Controller
 {
     private readonly MealPlannerDbContext _context;
+    private readonly IWebHostEnvironment _environment;
 
-    public PlannerController(MealPlannerDbContext context)
+    public PlannerController(MealPlannerDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
+        _environment = environment;
     }
 
     public async Task<IActionResult> Index()
@@ -89,6 +93,52 @@ public class PlannerController : Controller
         TempData["PlannerSuccess"] = "План харчування та список покупок успішно збережено.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ExportText(PlannerPageViewModel model)
+    {
+        await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
+        NormalizeMeals(model);
+
+        ValidatePlannerInput(model);
+
+        if (!ModelState.IsValid)
+        {
+            return View("Index", model);
+        }
+
+        await BuildResultAsync(model);
+
+        var exportsPath = Path.Combine(_environment.WebRootPath, "exports");
+        Directory.CreateDirectory(exportsPath);
+
+        var fileName = $"meal-plan-{DateTime.Now:yyyyMMdd-HHmmss}.txt";
+        var filePath = Path.Combine(exportsPath, fileName);
+
+        await System.IO.File.WriteAllTextAsync(filePath, model.ExportText, Encoding.UTF8);
+
+        if (model.UserId.HasValue)
+        {
+            var export = new Export
+            {
+                Id = Guid.NewGuid(),
+                UserId = model.UserId.Value,
+                Type = "txt",
+                PlanId = null,
+                ListId = null,
+                FileUrl = $"/exports/{fileName}",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Exports.Add(export);
+            await _context.SaveChangesAsync();
+        }
+
+        var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        return File(bytes, "text/plain", fileName);
     }
 
     private async Task FillOptionsAsync(PlannerPageViewModel model)
@@ -427,6 +477,7 @@ public class PlannerController : Controller
         model.ActualCarb = decimal.Round(model.ActualCarb, 1);
         model.ActualFat = decimal.Round(model.ActualFat, 1);
         model.ActualKcal = decimal.Round(model.ActualKcal, 0);
+        model.ExportText = BuildExportText(model);
         model.HasResult = true;
     }
 
@@ -466,6 +517,41 @@ public class PlannerController : Controller
         model.ShoppingItems = shoppingMap.Values
             .OrderBy(x => x.FoodName)
             .ToList();
+    }
+
+    private string BuildExportText(PlannerPageViewModel model)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("MEAL PLANNER");
+        sb.AppendLine();
+        sb.AppendLine($"Білки: {model.ActualProtein} / {model.ProteinTarget}");
+        sb.AppendLine($"Жири: {model.ActualFat} / {model.FatTarget}");
+        sb.AppendLine($"Вуглеводи: {model.ActualCarb} / {model.CarbTarget}");
+        sb.AppendLine($"Калорії: {model.ActualKcal}");
+        sb.AppendLine();
+
+        foreach (var meal in model.ResultMeals)
+        {
+            sb.AppendLine($"{meal.MealName}:");
+
+            foreach (var item in meal.Items)
+            {
+                sb.AppendLine($"- {item.FoodName}: {item.DisplayQuantityValue} {item.DisplayUnitName}");
+            }
+
+            sb.AppendLine($"  Разом: Б {meal.ProteinTotal} / Ж {meal.FatTotal} / В {meal.CarbTotal} / {meal.KcalTotal} ккал");
+            sb.AppendLine();
+        }
+
+        sb.AppendLine($"Список покупок на {model.Days} дн.:");
+
+        foreach (var item in model.ShoppingItems)
+        {
+            sb.AppendLine($"- {item.FoodName}: {decimal.Round(item.DisplayQuantityValue, 0)} {item.DisplayUnitName}");
+        }
+
+        return sb.ToString();
     }
 
     private async Task<(Guid planId, Guid shopListId)> SavePlanAsync(PlannerPageViewModel model)

@@ -22,6 +22,8 @@ public class PlannerPageViewModel
     public Guid? SavedPlanId { get; set; }
     public Guid? SavedShopListId { get; set; }
 
+    public string ExportText { get; set; } = string.Empty;
+
     public List<PlannerPickerFoodViewModel> ProteinFoods { get; set; } = new();
     public List<PlannerPickerFoodViewModel> CarbFoods { get; set; } = new();
     public List<PlannerPickerFoodViewModel> FatFoods { get; set; } = new();

@@ -153,6 +153,10 @@
                         <button type="submit" asp-action="Save" class="btn btn-success btn-lg">
                             Зберегти план і список покупок
                         </button>
+
+                        <button type="submit" asp-action="ExportText" class="btn btn-outline-primary btn-lg">
+                            Експорт .txt
+                        </button>
                     </div>
                 </div>
             </form>
@@ -206,7 +210,7 @@
                                 {
                                     <li>
                                         <div>
-                                            <strong>@item.Emoji @item.FoodName</strong>: @item.QuantityValue @item.UnitName
+                                            <strong>@item.Emoji @item.FoodName</strong>: @item.DisplayQuantityValue @item.DisplayUnitName
                                             <div class="data-note">
                                                 @item.RoleName · Б @item.Protein / Ж @item.Fat / В @item.Carb / @item.Kcal ккал
                                             </div>
@@ -243,7 +247,7 @@
                         {
                             <div class="planner-shopping-row">
                                 <div class="planner-shopping-name">@item.Emoji @item.FoodName</div>
-                                <div class="planner-shopping-qty">@decimal.Round(item.TotalQuantity, 0) @item.UnitName</div>
+                                <div class="planner-shopping-qty">@decimal.Round(item.DisplayQuantityValue, 0) @item.DisplayUnitName</div>
                             </div>
                         }
                     </div>
@@ -252,6 +256,16 @@
                 {
                     <p class="empty-state">Список покупок поки що порожній.</p>
                 }
+            </div>
+        </div>
+        <div class="card planner-export-card mt-4">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Експорт</h3>
+                    <button type="button" class="btn btn-outline-primary" id="copyExportBtn">Копіювати текст</button>
+                </div>
+
+                <textarea id="plannerExportText" class="form-control planner-export-textarea" readonly>@Model.ExportText</textarea>
             </div>
         </div>
     }
