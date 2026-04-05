@@ -24,7 +24,9 @@ public class PlannerPageViewModel
     public Guid? SavedShopListId { get; set; }
 
     public List<SelectListItem> UserOptions { get; set; } = new();
-    public List<SelectListItem> FoodOptions { get; set; } = new();
+    public List<SelectListItem> ProteinFoodOptions { get; set; } = new();
+    public List<SelectListItem> CarbFoodOptions { get; set; } = new();
+    public List<SelectListItem> FatFoodOptions { get; set; } = new();
 
     public List<PlannerMealInputViewModel> Meals { get; set; } = new();
     public List<PlannerMealResultViewModel> ResultMeals { get; set; } = new();

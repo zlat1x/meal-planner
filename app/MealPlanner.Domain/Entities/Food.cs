@@ -8,6 +8,8 @@ public class Food
     public Guid Per100UnitId { get; set; }
 
     public string Name { get; set; } = null!;
+    public FoodCategory Category { get; set; }
+
     public decimal ProteinPer100 { get; set; }
     public decimal CarbsPer100 { get; set; }
     public decimal FatPer100 { get; set; }

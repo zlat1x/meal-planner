@@ -30,4 +30,10 @@ app.MapControllerRoute(
     pattern: "{controller=Planner}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MealPlannerDbContext>();
+    await MealPlannerSeed.SeedAsync(context);
+}
+
 app.Run();

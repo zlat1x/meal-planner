@@ -109,21 +109,21 @@
                                     <div class="planner-food-role-grid">
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Білковий продукт</div>
-                                            <select asp-for="Meals[@i].ProteinFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                            <select asp-for="Meals[@i].ProteinFoodId" class="form-select planner-food-select" asp-items="Model.ProteinFoodOptions">
                                                 <option value="">Не вибрано</option>
                                             </select>
                                         </div>
 
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Вуглеводний продукт</div>
-                                            <select asp-for="Meals[@i].CarbFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                            <select asp-for="Meals[@i].CarbFoodId" class="form-select planner-food-select" asp-items="Model.CarbFoodOptions">
                                                 <option value="">Не вибрано</option>
                                             </select>
                                         </div>
 
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Жировий продукт</div>
-                                            <select asp-for="Meals[@i].FatFoodId" class="form-select planner-food-select" asp-items="Model.FoodOptions">
+                                            <select asp-for="Meals[@i].FatFoodId" class="form-select planner-food-select" asp-items="Model.FatFoodOptions">
                                                 <option value="">Не вибрано</option>
                                             </select>
                                         </div>

@@ -112,11 +112,32 @@ public class PlannerController : Controller
             Text = x.Name
         }).ToList();
 
-        model.FoodOptions = foods.Select(x => new SelectListItem
-        {
-            Value = x.Id.ToString(),
-            Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
-        }).ToList();
+        model.ProteinFoodOptions = foods
+            .Where(x => x.Category == FoodCategory.Protein)
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
+            })
+            .ToList();
+
+        model.CarbFoodOptions = foods
+            .Where(x => x.Category == FoodCategory.Carb)
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
+            })
+            .ToList();
+
+        model.FatFoodOptions = foods
+            .Where(x => x.Category == FoodCategory.Fat)
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
+            })
+            .ToList();
     }
 
     private async Task SetCurrentUserAsync(PlannerPageViewModel model)
