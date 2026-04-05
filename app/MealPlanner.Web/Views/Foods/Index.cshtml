@@ -35,6 +35,17 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h4 mb-2">Діаграма продуктів за одиницями вимірювання</h2>
+        <p class="text-muted mb-4">
+            На діаграмі показано, скільки продуктів у базі мають кожну одиницю вимірювання.
+        </p>
+
+        <div id="foodsByUnitChart" style="width: 100%; min-height: 420px;"></div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         @if (items.Any())
@@ -99,3 +110,54 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawFoodsByUnitChart);
+
+        async function drawFoodsByUnitChart() {
+            const container = document.getElementById('foodsByUnitChart');
+
+            try {
+                const response = await fetch('/api/charts/foods-by-unit');
+
+                if (!response.ok) {
+                    throw new Error('Не вдалося отримати дані для діаграми.');
+                }
+
+                const items = await response.json();
+
+                const data = new google.visualization.DataTable();
+                data.addColumn('string', 'Одиниця');
+                data.addColumn('number', 'Кількість продуктів');
+
+                for (const item of items) {
+                    data.addRow([item.unitName, item.count]);
+                }
+
+                const options = {
+                    title: 'Кількість продуктів за одиницями вимірювання',
+                    pieHole: 0.35,
+                    legend: { position: 'right' },
+                    chartArea: {
+                        left: 20,
+                        top: 60,
+                        width: '80%',
+                        height: '75%'
+                    }
+                };
+
+                const chart = new google.visualization.PieChart(container);
+                chart.draw(data, options);
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div class="alert alert-danger mb-0">Не вдалося завантажити діаграму.</div>';
+            }
+        }
+
+        window.addEventListener('resize', drawFoodsByUnitChart);
+    </script>
+}
