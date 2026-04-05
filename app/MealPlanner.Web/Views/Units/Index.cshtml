@@ -1,37 +1,76 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Unit>
 
 @{
-    ViewData["Title"] = "Units";
+    ViewData["Title"] = "Одиниці вимірювання";
+    var items = Model.ToList();
 }
 
-<h1>Units</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Одиниці вимірювання</h1>
+        <p class="page-subtitle">Довідник одиниць для продуктів, прийомів їжі та списків покупок.</p>
+    </div>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати одиницю</a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new unit</a>
-</p>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього одиниць</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Типів</div>
+        <div class="summary-card-value">@items.Select(x => x.Kind).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Кодів</div>
+        <div class="summary-card-value">@items.Select(x => x.Code).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Стан</div>
+        <div class="summary-card-value">Активно</div>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Kind</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.Code</td>
-            <td>@item.Name</td>
-            <td>@item.Kind</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Назва</th>
+                            <th>Тип</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Name</td>
+                            <td>@item.Kind</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Одиниць вимірювання ще немає.</p>
+        }
+    </div>
+</div>

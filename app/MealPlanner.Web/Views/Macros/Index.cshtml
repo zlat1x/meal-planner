@@ -1,43 +1,82 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Macro>
 
 @{
-    ViewData["Title"] = "Macros";
+    ViewData["Title"] = "Макроси";
+    var items = Model.ToList();
 }
 
-<h1>Macros</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Макроси</h1>
+        <p class="page-subtitle">Цілі БЖВ для користувачів системи.</p>
+    </div>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати макрос</a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new macro</a>
-</p>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього макросів</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Режимів</div>
+        <div class="summary-card-value">@items.Select(x => x.Mode).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Середні білки</div>
+        <div class="summary-card-value">@(items.Any() ? Math.Round(items.Average(x => x.ProteinG), 1) : 0)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Середні ккал</div>
+        <div class="summary-card-value">@(items.Any() ? items.Average(x => x.ProteinG * 4 + x.CarbsG * 4 + x.FatG * 9).ToString("0") : "0")</div>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Protein</th>
-            <th>Carbs</th>
-            <th>Fat</th>
-            <th>Mode</th>
-            <th>Created at</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.User.Name</td>
-            <td>@item.ProteinG</td>
-            <td>@item.CarbsG</td>
-            <td>@item.FatG</td>
-            <td>@item.Mode</td>
-            <td>@item.CreatedAt</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Режим</th>
+                            <th>Білки</th>
+                            <th>Вуглеводи</th>
+                            <th>Жири</th>
+                            <th>Створено</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.User.Name</td>
+                            <td>@item.Mode</td>
+                            <td>@item.ProteinG</td>
+                            <td>@item.CarbsG</td>
+                            <td>@item.FatG</td>
+                            <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Макросів ще немає.</p>
+        }
+    </div>
+</div>

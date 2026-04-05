@@ -1,39 +1,78 @@
 @model IEnumerable<MealPlanner.Domain.Entities.Profile>
 
 @{
-    ViewData["Title"] = "Profiles";
+    ViewData["Title"] = "Профілі";
+    var items = Model.ToList();
 }
 
-<h1>Profiles</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Профілі користувачів</h1>
+        <p class="page-subtitle">Вага, цілі та інша персональна інформація користувачів.</p>
+    </div>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати профіль</a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new profile</a>
-</p>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього профілів</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Із вагою</div>
+        <div class="summary-card-value">@items.Count(x => x.WeightKg.HasValue)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Із ціллю</div>
+        <div class="summary-card-value">@items.Count(x => !string.IsNullOrWhiteSpace(x.Goal))</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Оновлено сьогодні</div>
+        <div class="summary-card-value">@items.Count(x => x.UpdatedAt.Date == DateTime.UtcNow.Date)</div>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Weight</th>
-            <th>Goal</th>
-            <th>Updated at</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.User.Name</td>
-            <td>@item.WeightKg</td>
-            <td>@item.Goal</td>
-            <td>@item.UpdatedAt</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Вага</th>
+                            <th>Ціль</th>
+                            <th>Оновлено</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.User.Name</td>
+                            <td>@(item.WeightKg?.ToString() ?? "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Goal) ? "—" : item.Goal)</td>
+                            <td>@item.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Профілі ще не створені.</p>
+        }
+    </div>
+</div>

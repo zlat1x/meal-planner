@@ -1,43 +1,91 @@
 @model IEnumerable<MealPlanner.Domain.Entities.MealItem>
 
 @{
-    ViewData["Title"] = "Meal items";
+    ViewData["Title"] = "Позиції у плані";
+    var items = Model.ToList();
 }
 
-<h1>Meal items</h1>
+<div class="page-hero">
+    <div class="page-title-wrap">
+        <h1>Позиції у плані харчування</h1>
+        <p class="page-subtitle">Продукти, кількість і поживні значення в кожному прийомі їжі.</p>
+    </div>
+    <div class="page-actions">
+        <a asp-action="Create" class="btn btn-primary">Додати позицію</a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new meal item</a>
-</p>
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="summary-card-title">Усього позицій</div>
+        <div class="summary-card-value">@items.Count</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Заблокованих</div>
+        <div class="summary-card-value">@items.Count(x => x.IsLocked)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Продуктів</div>
+        <div class="summary-card-value">@items.Select(x => x.FoodId).Distinct().Count()</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Прийомів їжі</div>
+        <div class="summary-card-value">@items.Select(x => x.MealId).Distinct().Count()</div>
+    </div>
+</div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Meal</th>
-            <th>Food</th>
-            <th>Quantity</th>
-            <th>Quantity unit</th>
-            <th>Per 100 unit</th>
-            <th>Locked</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model)
-{
-        <tr>
-            <td>@item.Meal.Name</td>
-            <td>@item.Food.Name</td>
-            <td>@item.QuantityValue</td>
-            <td>@item.QuantityUnit.Name</td>
-            <td>@item.Per100Unit.Name</td>
-            <td>@item.IsLocked</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body">
+        @if (items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Прийом їжі</th>
+                            <th>Продукт</th>
+                            <th>Кількість</th>
+                            <th>Одиниця</th>
+                            <th>Ккал / 100</th>
+                            <th>Стан</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>День @item.Meal.DayNo · Прийом @item.Meal.MealNo</td>
+                            <td>@item.Food.Name</td>
+                            <td>@item.QuantityValue</td>
+                            <td>@item.QuantityUnit.Name</td>
+                            <td>@item.KcalPer100</td>
+                            <td>
+                                @if (item.IsLocked)
+                                {
+                                    <span class="status-badge status-orange">Заблоковано</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-green">Активно</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="empty-state">Позицій у плані ще немає.</p>
+        }
+    </div>
+</div>
