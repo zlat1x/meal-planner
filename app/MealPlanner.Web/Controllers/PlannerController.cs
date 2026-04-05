@@ -141,6 +141,47 @@ public class PlannerController : Controller
         return File(bytes, "text/plain", fileName);
     }
 
+    private List<decimal> GetMacroWeights(int mealsPerDay)
+    {
+        return mealsPerDay switch
+        {
+            2 => new List<decimal> { 0.45m, 0.55m },
+            3 => new List<decimal> { 0.30m, 0.35m, 0.35m },
+            4 => new List<decimal> { 0.25m, 0.25m, 0.25m, 0.25m },
+            _ => Enumerable.Repeat(1m / mealsPerDay, mealsPerDay).ToList()
+        };
+    }
+
+    private List<decimal> DistributeMacro(
+        List<PlannerMealInputViewModel> meals,
+        decimal total,
+        Func<PlannerMealInputViewModel, bool> hasMacro)
+    {
+        var weights = GetMacroWeights(meals.Count);
+
+        var indexes = meals
+            .Select((meal, i) => new { meal, i })
+            .Where(x => hasMacro(x.meal))
+            .Select(x => x.i)
+            .ToList();
+
+        var result = Enumerable.Repeat(0m, meals.Count).ToList();
+
+        if (indexes.Count == 0 || total <= 0)
+        {
+            return result;
+        }
+
+        var totalWeight = indexes.Sum(i => weights[i]);
+
+        foreach (var i in indexes)
+        {
+            result[i] = decimal.Round(total * weights[i] / totalWeight, 1);
+        }
+
+        return result;
+    }
+
     private async Task FillOptionsAsync(PlannerPageViewModel model)
     {
         var foods = await _context.Foods
@@ -221,6 +262,56 @@ public class PlannerController : Controller
             .OrderBy(x => x.MealNo)
             .Take(model.MealsPerDay)
             .ToList();
+    }
+
+    private List<decimal> GetCarbDistributionWeights(int mealsPerDay)
+    {
+        return mealsPerDay switch
+        {
+            2 => new List<decimal> { 0.45m, 0.55m },
+            3 => new List<decimal> { 0.30m, 0.35m, 0.35m },
+            4 => new List<decimal> { 0.25m, 0.25m, 0.25m, 0.25m },
+            _ => Enumerable.Repeat(1m / mealsPerDay, mealsPerDay).ToList()
+        };
+    }
+
+    private List<decimal> BuildCarbTargetsForMeals(List<PlannerMealInputViewModel> activeMeals, decimal remainingCarb)
+    {
+        var weights = GetCarbDistributionWeights(activeMeals.Count);
+
+        var carbMealIndexes = activeMeals
+            .Select((meal, index) => new { meal, index })
+            .Where(x => x.meal.CarbFoodId.HasValue)
+            .Select(x => x.index)
+            .ToList();
+
+        var targets = Enumerable.Repeat(0m, activeMeals.Count).ToList();
+
+        if (remainingCarb <= 0 || carbMealIndexes.Count == 0)
+        {
+            return targets;
+        }
+
+        var totalWeight = carbMealIndexes.Sum(index => weights[index]);
+
+        if (totalWeight <= 0)
+        {
+            var equalPart = remainingCarb / carbMealIndexes.Count;
+
+            foreach (var index in carbMealIndexes)
+            {
+                targets[index] = equalPart;
+            }
+
+            return targets;
+        }
+
+        foreach (var index in carbMealIndexes)
+        {
+            targets[index] = decimal.Round(remainingCarb * weights[index] / totalWeight, 1);
+        }
+
+        return targets;
     }
 
     private async Task ApplyUserDefaultsAsync(PlannerPageViewModel model)
@@ -318,7 +409,6 @@ public class PlannerController : Controller
         var fixedProtein = 0m;
         var fixedFatFromProtein = 0m;
         var fixedCarbFromProtein = 0m;
-        var dynamicProteinSlots = 0;
 
         foreach (var meal in activeMeals)
         {
@@ -360,35 +450,36 @@ public class PlannerController : Controller
                 continue;
             }
 
-            dynamicProteinSlots++;
             proteinSlotData.Add(ProteinSlotData.Dynamic());
         }
 
+        // =======================
+        // PROTEIN
+        // =======================
         var remainingProtein = model.ProteinTarget - fixedProtein;
         if (remainingProtein < 0)
         {
             remainingProtein = 0;
         }
 
-        var proteinPerDynamicSlot = dynamicProteinSlots > 0
-            ? remainingProtein / dynamicProteinSlots
-            : 0;
+        var proteinTargets = DistributeMacro(
+            activeMeals,
+            remainingProtein,
+            m => m.ProteinFoodId.HasValue);
 
-        var carbDynamicSlots = activeMeals.Count(x =>
-        {
-            var food = GetFood(foods, x.CarbFoodId);
-            return food != null && !IsEmptyFood(food);
-        });
-
+        // =======================
+        // CARB
+        // =======================
         var remainingCarb = model.CarbTarget - fixedCarbFromProtein;
         if (remainingCarb < 0)
         {
             remainingCarb = 0;
         }
 
-        var carbPerSlot = carbDynamicSlots > 0
-            ? remainingCarb / carbDynamicSlots
-            : 0;
+        var carbTargets = DistributeMacro(
+            activeMeals,
+            remainingCarb,
+            m => m.CarbFoodId.HasValue);
 
         var mealsTemp = new List<MealTempData>();
         var usedProtein = fixedProtein;
@@ -403,8 +494,8 @@ public class PlannerController : Controller
             var carbFood = GetFood(foods, mealInput.CarbFoodId);
             var fatFood = GetFood(foods, mealInput.FatFoodId);
 
-            var proteinItem = BuildProteinItem(proteinFood, proteinSlotData[index], proteinPerDynamicSlot);
-            var carbItem = BuildCarbItem(carbFood, carbPerSlot);
+            var proteinItem = BuildProteinItem(proteinFood, proteinSlotData[index], proteinTargets[index]);
+            var carbItem = BuildCarbItem(carbFood, carbTargets[index]);
 
             if (proteinItem != null)
             {
@@ -430,9 +521,10 @@ public class PlannerController : Controller
             });
         }
 
+        // =======================
+        // FAT
+        // =======================
         var remainingFat = model.FatTarget - usedFat;
-        var dynamicFatSlots = mealsTemp.Count(x => x.FatFood != null && !IsEmptyFood(x.FatFood));
-
         var fatOverkill = remainingFat < -5m;
 
         if (remainingFat < 0)
@@ -440,12 +532,15 @@ public class PlannerController : Controller
             remainingFat = 0;
         }
 
-        var fatPerSlot = dynamicFatSlots > 0
-            ? remainingFat / dynamicFatSlots
-            : 0;
+        var fatTargets = DistributeMacro(
+            activeMeals,
+            remainingFat,
+            m => m.FatFoodId.HasValue);
 
-        foreach (var temp in mealsTemp)
+        for (var index = 0; index < mealsTemp.Count; index++)
         {
+            var temp = mealsTemp[index];
+
             var mealResult = new PlannerMealResultViewModel
             {
                 MealNo = temp.MealNo,
@@ -455,7 +550,7 @@ public class PlannerController : Controller
             AddItemIfExists(mealResult, temp.ProteinItem);
             AddItemIfExists(mealResult, temp.CarbItem);
 
-            var fatItem = BuildFatItem(temp.FatFood, fatPerSlot, fatOverkill);
+            var fatItem = BuildFatItem(temp.FatFood, fatTargets[index], fatOverkill);
             AddItemIfExists(mealResult, fatItem);
 
             mealResult.ProteinTotal = decimal.Round(mealResult.Items.Sum(x => x.Protein), 1);

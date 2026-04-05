@@ -73,12 +73,13 @@ public static class MealPlannerSeed
         else if (!await context.Foods.AnyAsync())
         {
             var demoUser = await context.Users.OrderBy(x => x.CreatedAt).FirstAsync();
-            var gramUnit = await context.Units.FirstAsync();
+            var unitMap = await CreateUnits(context); 
+            var gramUnitId = unitMap["gram"];
 
             var icons = await context.Icons.ToListAsync();
             var iconMap = icons.ToDictionary(x => x.Code, x => x.Id);
 
-            var foods = CreateFoods(demoUser.Id, gramUnit.Id, iconMap);
+            var foods = CreateFoods(demoUser.Id, gramUnitId, iconMap);
             context.Foods.AddRange(foods);
 
             await context.SaveChangesAsync();
