@@ -46,6 +46,17 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h4 mb-2">Середні макроси по категоріях</h2>
+        <p class="text-muted mb-4">
+            Порівняння середнього вмісту білків, жирів і вуглеводів у різних категоріях продуктів.
+        </p>
+
+        <div id="macrosChart" style="width: 100%; min-height: 420px;"></div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         @if (items.Any())
@@ -116,7 +127,12 @@
 
     <script>
         google.charts.load('current', { packages: ['corechart'] });
-        google.charts.setOnLoadCallback(drawFoodsByCategoryChart);
+        google.charts.setOnLoadCallback(drawAllCharts);
+
+        function drawAllCharts() {
+            drawFoodsByCategoryChart();
+            drawMacrosChart(); 
+        }
 
         async function drawFoodsByCategoryChart() {
             const container = document.getElementById('foodsByCategoryChart');
@@ -158,5 +174,39 @@
         }
 
         window.addEventListener('resize', drawFoodsByCategoryChart);
+
+        async function drawMacrosChart() {
+            const container = document.getElementById('macrosChart');
+
+            try {
+                const response = await fetch('/api/charts/macros-by-category');
+
+                if (!response.ok) {
+                    throw new Error('Помилка завантаження макросів.');
+                }
+
+                const items = await response.json();
+
+                const data = new google.visualization.DataTable();
+                data.addColumn('string', 'Категорія');
+                data.addColumn('number', 'Білки');
+                data.addColumn('number', 'Вуглеводи');
+                data.addColumn('number', 'Жири');
+
+                for (const item of items) {
+                    data.addRow([
+                        item.categoryName,
+                        item.protein,
+                        item.carbs,
+                        item.fat
+                    ]);
+                }
+
+                const chart = new google.visualization.ColumnChart(container);
+                chart.draw(data, {});
+            } catch (error) {
+                console.error(error);
+            }
+        }
     </script>
 }
