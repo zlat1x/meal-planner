@@ -15,24 +15,23 @@ public class ChartsController : ControllerBase
         _context = context;
     }
 
-    private sealed class FoodsByUnitDto
+    private sealed class FoodsByCategoryDto
     {
-        public string UnitName { get; set; } = null!;
+        public string CategoryName { get; set; } = null!;
         public int Count { get; set; }
     }
 
-    [HttpGet("foods-by-unit")]
-    public async Task<IActionResult> GetFoodsByUnit()
+    [HttpGet("foods-by-category")]
+    public async Task<IActionResult> GetFoodsByCategory()
     {
         var data = await _context.Foods
-            .Include(x => x.Per100Unit)
-            .GroupBy(x => x.Per100Unit.Name)
-            .Select(g => new FoodsByUnitDto
+            .GroupBy(x => x.Category)
+            .Select(g => new FoodsByCategoryDto
             {
-                UnitName = g.Key,
+                CategoryName = g.Key.ToString(),
                 Count = g.Count()
             })
-            .OrderBy(x => x.UnitName)
+            .OrderBy(x => x.CategoryName)
             .ToListAsync();
 
         return Ok(data);
