@@ -19,7 +19,9 @@ public class PlannerController : Controller
     public async Task<IActionResult> Index()
     {
         var model = new PlannerPageViewModel();
+
         await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
         NormalizeMeals(model);
 
         if (TempData["PlannerSuccess"] is string message)
@@ -35,6 +37,7 @@ public class PlannerController : Controller
     public async Task<IActionResult> LoadDefaults(PlannerPageViewModel model)
     {
         await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
         NormalizeMeals(model);
         await ApplyUserDefaultsAsync(model);
 
@@ -46,6 +49,7 @@ public class PlannerController : Controller
     public async Task<IActionResult> Calculate(PlannerPageViewModel model)
     {
         await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
         NormalizeMeals(model);
 
         ValidatePlannerInput(model);
@@ -65,6 +69,7 @@ public class PlannerController : Controller
     public async Task<IActionResult> Save(PlannerPageViewModel model)
     {
         await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
         NormalizeMeals(model);
 
         ValidatePlannerInput(model);
@@ -112,6 +117,22 @@ public class PlannerController : Controller
             Value = x.Id.ToString(),
             Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
         }).ToList();
+    }
+
+    private async Task SetCurrentUserAsync(PlannerPageViewModel model)
+    {
+        if (model.UserId.HasValue)
+        {
+            return;
+        }
+
+        var firstUserId = await _context.Users
+            .AsNoTracking()
+            .OrderBy(x => x.CreatedAt)
+            .Select(x => (Guid?)x.Id)
+            .FirstOrDefaultAsync();
+
+        model.UserId = firstUserId;
     }
 
     private void NormalizeMeals(PlannerPageViewModel model)
@@ -163,7 +184,7 @@ public class PlannerController : Controller
     {
         if (!model.UserId.HasValue)
         {
-            ModelState.AddModelError("UserId", "Спочатку вибери користувача.");
+            ModelState.AddModelError(string.Empty, "У базі даних не знайдено користувача для роботи конструктора.");
             return;
         }
 
@@ -174,7 +195,7 @@ public class PlannerController : Controller
 
         if (configuration == null)
         {
-            ModelState.AddModelError("UserId", "Для цього користувача не знайдено конфігурацію.");
+            ModelState.AddModelError(string.Empty, "Для поточного користувача не знайдено конфігурацію.");
             return;
         }
 
@@ -197,7 +218,7 @@ public class PlannerController : Controller
     {
         if (!model.UserId.HasValue)
         {
-            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
+            ModelState.AddModelError(string.Empty, "У базі даних не знайдено користувача для збереження плану.");
         }
 
         if (model.ProteinTarget <= 0)

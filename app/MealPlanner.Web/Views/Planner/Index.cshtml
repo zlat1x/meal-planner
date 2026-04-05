@@ -4,12 +4,13 @@
     ViewData["Title"] = "Конструктор меню";
 }
 
-<div class="page-hero">
-    <div class="page-title-wrap">
-        <h1>Конструктор меню</h1>
-        <p class="page-subtitle">
-            Користувацький режим роботи: вибір цілей БЖВ, продуктів для прийомів їжі,
-            автоматичний розрахунок меню, формування списку покупок і збереження в базу.
+<div class="planner-hero mb-4">
+    <div class="planner-hero-content">
+        <span class="info-badge">Meal Planner</span>
+        <h1 class="display-5 mb-3">Конструктор меню</h1>
+        <p class="planner-hero-text">
+            Склади свій раціон на кілька днів: обери кількість прийомів їжі, продукти та ціль БЖВ.
+            Система розрахує меню, підсумки по макросах і сформує список покупок.
         </p>
     </div>
 </div>
@@ -21,22 +22,14 @@
     </div>
 }
 
-<div class="card mb-4">
+<div class="card planner-main-card mb-4">
     <div class="card-body">
         <form asp-controller="Planner" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label asp-for="UserId" class="form-label">Користувач</label>
-                    <select asp-for="UserId" class="form-select" asp-items="Model.UserOptions">
-                        <option value="">Вибери користувача</option>
-                    </select>
-                    <span asp-validation-for="UserId" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-2">
+            <div class="planner-top-grid mb-4">
+                <div class="planner-top-box">
                     <label asp-for="MealsPerDay" class="form-label">Прийомів їжі</label>
                     <select asp-for="MealsPerDay" class="form-select">
                         <option value="2">2</option>
@@ -45,7 +38,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="planner-top-box">
                     <label asp-for="Days" class="form-label">Днів</label>
                     <select asp-for="Days" class="form-select">
                         <option value="1">1</option>
@@ -55,83 +48,99 @@
                     </select>
                 </div>
 
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="planner-top-box planner-top-box-wide">
+                    <label class="form-label d-block">&nbsp;</label>
                     <button type="submit" asp-action="LoadDefaults" class="btn btn-outline-primary w-100">
-                        Підтягнути цілі користувача
+                        Підтягнути мої цілі БЖВ
                     </button>
                 </div>
             </div>
 
-            <hr class="my-4" />
-
-            <h3 class="mb-3">Ціль БЖВ</h3>
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label asp-for="ProteinTarget" class="form-label">Білки</label>
-                    <input asp-for="ProteinTarget" class="form-control" />
-                    <span asp-validation-for="ProteinTarget" class="text-danger"></span>
+            <div class="planner-target-card mb-4">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Ціль БЖВ</h3>
+                    <span class="planner-section-note">На день</span>
                 </div>
-                <div class="col-md-4">
-                    <label asp-for="CarbTarget" class="form-label">Вуглеводи</label>
-                    <input asp-for="CarbTarget" class="form-control" />
-                    <span asp-validation-for="CarbTarget" class="text-danger"></span>
-                </div>
-                <div class="col-md-4">
-                    <label asp-for="FatTarget" class="form-label">Жири</label>
-                    <input asp-for="FatTarget" class="form-control" />
-                    <span asp-validation-for="FatTarget" class="text-danger"></span>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="ProteinTarget" class="form-label">Білки</label>
+                        <input asp-for="ProteinTarget" class="form-control" />
+                        <span asp-validation-for="ProteinTarget" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FatTarget" class="form-label">Жири</label>
+                        <input asp-for="FatTarget" class="form-control" />
+                        <span asp-validation-for="FatTarget" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="CarbTarget" class="form-label">Вуглеводи</label>
+                        <input asp-for="CarbTarget" class="form-control" />
+                        <span asp-validation-for="CarbTarget" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
 
-            <hr class="my-4" />
+            <div class="section-header mb-3">
+                <h3 class="mb-0">Прийоми їжі</h3>
+                <span class="planner-section-note">Оберіть продукти для кожного прийому</span>
+            </div>
 
-            <h3 class="mb-3">Вибір продуктів для прийомів їжі</h3>
+            <div class="row g-4">
+                @for (var i = 0; i < Model.Meals.Count; i++)
+                {
+                    <div class="col-xl-6">
+                        <div class="card planner-meal-card h-100">
+                            <div class="card-body">
+                                <input asp-for="Meals[@i].MealNo" type="hidden" />
 
-            @for (var i = 0; i < Model.Meals.Count; i++)
-            {
-                <div class="card mb-3 planner-meal-card">
-                    <div class="card-body">
-                        <input asp-for="Meals[@i].MealNo" type="hidden" />
+                                <div class="section-header mb-3">
+                                    <h4 class="mb-0">Прийом @Model.Meals[i].MealNo</h4>
+                                    <span class="status-badge status-blue">Меню</span>
+                                </div>
 
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label asp-for="Meals[@i].MealName" class="form-label">Назва прийому</label>
-                                <input asp-for="Meals[@i].MealName" class="form-control" />
-                                <span asp-validation-for="Meals[@i].MealName" class="text-danger"></span>
-                            </div>
+                                <div class="mb-3">
+                                    <label asp-for="Meals[@i].MealName" class="form-label">Назва прийому</label>
+                                    <input asp-for="Meals[@i].MealName" class="form-control" />
+                                    <span asp-validation-for="Meals[@i].MealName" class="text-danger"></span>
+                                </div>
 
-                            <div class="col-md-3">
-                                <label asp-for="Meals[@i].ProteinFoodId" class="form-label">Білковий продукт</label>
-                                <select asp-for="Meals[@i].ProteinFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                    <option value="">Не вибрано</option>
-                                </select>
-                            </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label asp-for="Meals[@i].ProteinFoodId" class="form-label">Білковий продукт</label>
+                                        <select asp-for="Meals[@i].ProteinFoodId" class="form-select" asp-items="Model.FoodOptions">
+                                            <option value="">Не вибрано</option>
+                                        </select>
+                                    </div>
 
-                            <div class="col-md-3">
-                                <label asp-for="Meals[@i].CarbFoodId" class="form-label">Вуглеводний продукт</label>
-                                <select asp-for="Meals[@i].CarbFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                    <option value="">Не вибрано</option>
-                                </select>
-                            </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="Meals[@i].CarbFoodId" class="form-label">Вуглеводний продукт</label>
+                                        <select asp-for="Meals[@i].CarbFoodId" class="form-select" asp-items="Model.FoodOptions">
+                                            <option value="">Не вибрано</option>
+                                        </select>
+                                    </div>
 
-                            <div class="col-md-3">
-                                <label asp-for="Meals[@i].FatFoodId" class="form-label">Жировий продукт</label>
-                                <select asp-for="Meals[@i].FatFoodId" class="form-select" asp-items="Model.FoodOptions">
-                                    <option value="">Не вибрано</option>
-                                </select>
+                                    <div class="col-md-4">
+                                        <label asp-for="Meals[@i].FatFoodId" class="form-label">Жировий продукт</label>
+                                        <select asp-for="Meals[@i].FatFoodId" class="form-select" asp-items="Model.FoodOptions">
+                                            <option value="">Не вибрано</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
 
             <div class="d-flex gap-2 flex-wrap mt-4">
-                <button type="submit" asp-action="Calculate" class="btn btn-primary">
+                <button type="submit" asp-action="Calculate" class="btn btn-primary btn-lg">
                     Розрахувати меню
                 </button>
 
-                <button type="submit" asp-action="Save" class="btn btn-success">
+                <button type="submit" asp-action="Save" class="btn btn-success btn-lg">
                     Зберегти план і список покупок
                 </button>
             </div>
@@ -141,32 +150,40 @@
 
 @if (Model.HasResult)
 {
-    <div class="summary-grid mb-4">
-        <div class="summary-card">
-            <div class="summary-card-title">Білки</div>
-            <div class="summary-card-value">@Model.ActualProtein / @Model.ProteinTarget</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-card-title">Жири</div>
-            <div class="summary-card-value">@Model.ActualFat / @Model.FatTarget</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-card-title">Вуглеводи</div>
-            <div class="summary-card-value">@Model.ActualCarb / @Model.CarbTarget</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-card-title">Калорії</div>
-            <div class="summary-card-value">@Model.ActualKcal</div>
+    <div class="planner-summary-wrap mb-4">
+        <div class="summary-grid mb-0">
+            <div class="summary-card planner-summary-card">
+                <div class="summary-card-title">Білки</div>
+                <div class="summary-card-value">@Model.ActualProtein / @Model.ProteinTarget</div>
+            </div>
+
+            <div class="summary-card planner-summary-card">
+                <div class="summary-card-title">Жири</div>
+                <div class="summary-card-value">@Model.ActualFat / @Model.FatTarget</div>
+            </div>
+
+            <div class="summary-card planner-summary-card">
+                <div class="summary-card-title">Вуглеводи</div>
+                <div class="summary-card-value">@Model.ActualCarb / @Model.CarbTarget</div>
+            </div>
+
+            <div class="summary-card planner-summary-card">
+                <div class="summary-card-title">Калорії</div>
+                <div class="summary-card-value">@Model.ActualKcal</div>
+            </div>
         </div>
     </div>
 
-    <h2 class="section-title">Результат меню</h2>
+    <div class="section-header mb-3">
+        <h2 class="mb-0">Результат меню</h2>
+        <span class="planner-section-note">Готовий варіант на 1 день</span>
+    </div>
 
     <div class="row g-4">
         @foreach (var meal in Model.ResultMeals)
         {
             <div class="col-lg-6">
-                <div class="card">
+                <div class="card planner-result-card h-100">
                     <div class="card-body">
                         <div class="section-header">
                             <h3 class="mb-0">@meal.MealName</h3>
@@ -201,9 +218,12 @@
         }
     </div>
 
-    <h2 class="section-title mt-5">Список покупок на @Model.Days дн.</h2>
+    <div class="section-header mt-5 mb-3">
+        <h2 class="mb-0">Список покупок</h2>
+        <span class="planner-section-note">На @Model.Days дн.</span>
+    </div>
 
-    <div class="card">
+    <div class="card planner-shopping-card">
         <div class="card-body">
             @if (Model.ShoppingItems.Any())
             {
