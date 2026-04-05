@@ -1,20 +1,18 @@
-﻿@model MealPlanner.Web.Models.HomeDashboardViewModel
-
-@{
+﻿@{
     ViewData["Title"] = "Головна";
 }
 
 <div class="dashboard-hero">
     <div class="row align-items-center g-4">
-        <div class="col-lg-7">
-            <span class="info-badge">Meal Planner · вебдодаток</span>
+        <div class="col-lg-8">
+            <span class="info-badge">Meal Planner</span>
             <h1 class="display-5 mb-3">Планування харчування в одному місці</h1>
             <p class="dashboard-lead">
-                Meal Planner допомагає керувати користувачами, цілями БЖВ, продуктами,
-                планами харчування, списками покупок та історією експортів.
+                Meal Planner допомагає скласти раціон, розрахувати меню під ціль БЖВ,
+                сформувати список покупок та працювати з базою продуктів.
             </p>
 
-            <div class="hero-actions"></div>
+            <div class="hero-actions">
                 <a asp-controller="Planner" asp-action="Index" class="btn btn-primary btn-lg me-2 mb-2">
                     Відкрити конструктор меню
                 </a>
@@ -22,310 +20,18 @@
                     Переглянути продукти
                 </a>
             </div>
-
         </div>
 
-        <div class="col-lg-5">
+        <div class="col-lg-4">
             <div class="dashboard-highlight-card">
-                <h3 class="mb-3">Що вже реалізовано</h3>
+                <h3 class="mb-3">Що доступно зараз</h3>
                 <ul class="feature-list">
-                    <li>Користувачі та профілі</li>
-                    <li>Цілі БЖВ та конфігурації</li>
-                    <li>База продуктів та одиниць вимірювання</li>
-                    <li>Плани харчування та прийоми їжі</li>
-                    <li>Списки покупок та експорт</li>
+                    <li>Конструктор меню на кілька днів</li>
+                    <li>Розрахунок БЖВ і калорій</li>
+                    <li>Формування списку покупок</li>
+                    <li>Збереження плану в базу даних</li>
+                    <li>Робота з продуктами та одиницями</li>
                 </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="stats-grid mt-4">
-    <div class="stat-card">
-        <div class="stat-label">Користувачі</div>
-        <div class="stat-value">@Model.UsersCount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Продукти</div>
-        <div class="stat-value">@Model.FoodsCount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Плани</div>
-        <div class="stat-value">@Model.PlansCount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Списки покупок</div>
-        <div class="stat-value">@Model.ShopListsCount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Експорти</div>
-        <div class="stat-value">@Model.ExportsCount</div>
-    </div>
-</div>
-
-<h2 class="section-title mt-5">Основні розділи</h2>
-<div class="row g-4">
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">Користувачі та профілі</h5>
-                <p class="card-text">
-                    Створення користувачів, ведення профілів та збереження базової інформації.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary">Користувачі</a>
-                    <a asp-controller="Profiles" asp-action="Index" class="btn btn-outline-primary">Профілі</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">Налаштування та БЖВ</h5>
-                <p class="card-text">
-                    Конфігурації користувачів, активні цілі БЖВ та журнал змін макросів.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Configurations" asp-action="Index" class="btn btn-primary">Конфігурації</a>
-                    <a asp-controller="Macros" asp-action="Index" class="btn btn-outline-primary">Макроси</a>
-                    <a asp-controller="MacroLogs" asp-action="Index" class="btn btn-outline-primary">Журнал</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">База продуктів</h5>
-                <p class="card-text">
-                    Керування продуктами, іконками та одиницями вимірювання.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Foods" asp-action="Index" class="btn btn-primary">Продукти</a>
-                    <a asp-controller="Icons" asp-action="Index" class="btn btn-outline-primary">Іконки</a>
-                    <a asp-controller="Units" asp-action="Index" class="btn btn-outline-primary">Одиниці</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">Плани харчування</h5>
-                <p class="card-text">
-                    Формування планів, прийомів їжі та конкретних позицій у меню.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Plans" asp-action="Index" class="btn btn-primary">Плани</a>
-                    <a asp-controller="Meals" asp-action="Index" class="btn btn-outline-primary">Прийоми їжі</a>
-                    <a asp-controller="MealItems" asp-action="Index" class="btn btn-outline-primary">Позиції</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">Списки покупок</h5>
-                <p class="card-text">
-                    Створення списків покупок і керування товарами для закупівлі.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="ShopLists" asp-action="Index" class="btn btn-primary">Списки</a>
-                    <a asp-controller="ShopItems" asp-action="Index" class="btn btn-outline-primary">Позиції</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <h5 class="card-title">Експорт</h5>
-                <p class="card-text">
-                    Перегляд історії експортів та доступ до збережених файлів.
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Exports" asp-action="Index" class="btn btn-primary">Експорти</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-4 mt-2">
-    <div class="col-xl-6">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="section-header">
-                    <h3 class="mb-0">Останні плани</h3>
-                    <a asp-controller="Plans" asp-action="Index">Усі плани</a>
-                </div>
-
-                @if (Model.LatestPlans.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Користувач</th>
-                                    <th>Статус</th>
-                                    <th>Днів</th>
-                                    <th>Створено</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var item in Model.LatestPlans)
-                            {
-                                <tr>
-                                    <td>@item.User.Name</td>
-                                    <td>
-                                        <span class="status-badge status-blue">@item.Status</span>
-                                    </td>
-                                    <td>@item.Days</td>
-                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <p class="empty-state">Поки що планів немає.</p>
-                }
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-6">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="section-header">
-                    <h3 class="mb-0">Останні продукти</h3>
-                    <a asp-controller="Foods" asp-action="Index">Усі продукти</a>
-                </div>
-
-                @if (Model.LatestFoods.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Продукт</th>
-                                    <th>Ккал / 100</th>
-                                    <th>Одиниця</th>
-                                    <th>Оновлено</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var item in Model.LatestFoods)
-                            {
-                                <tr>
-                                    <td>
-                                        <span class="me-2">@(item.Icon?.Emoji ?? "🍽️")</span>
-                                        @item.Name
-                                    </td>
-                                    <td>@item.KcalPer100</td>
-                                    <td>@item.Per100Unit.Name</td>
-                                    <td>@item.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <p class="empty-state">Поки що продуктів немає.</p>
-                }
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-6">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="section-header">
-                    <h3 class="mb-0">Останні списки покупок</h3>
-                    <a asp-controller="ShopLists" asp-action="Index">Усі списки</a>
-                </div>
-
-                @if (Model.LatestShopLists.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Користувач</th>
-                                    <th>Днів</th>
-                                    <th>Створено</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var item in Model.LatestShopLists)
-                            {
-                                <tr>
-                                    <td>@item.Plan.User.Name</td>
-                                    <td>@item.Days</td>
-                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <p class="empty-state">Поки що списків покупок немає.</p>
-                }
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-6">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="section-header">
-                    <h3 class="mb-0">Останні експорти</h3>
-                    <a asp-controller="Exports" asp-action="Index">Усі експорти</a>
-                </div>
-
-                @if (Model.LatestExports.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Користувач</th>
-                                    <th>Тип</th>
-                                    <th>Файл</th>
-                                    <th>Створено</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var item in Model.LatestExports)
-                            {
-                                <tr>
-                                    <td>@item.User.Name</td>
-                                    <td>@item.Type</td>
-                                    <td class="text-break">@item.FileUrl</td>
-                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <p class="empty-state">Поки що експортів немає.</p>
-                }
             </div>
         </div>
     </div>
