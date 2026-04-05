@@ -2,7 +2,6 @@ using MealPlanner.Domain.Entities;
 using MealPlanner.Infrastructure.Data;
 using MealPlanner.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Web.Controllers;
@@ -87,57 +86,46 @@ public class PlannerController : Controller
         model.SavedPlanId = saveResult.planId;
         model.SavedShopListId = saveResult.shopListId;
 
-        TempData["PlannerSuccess"] = "План харчування та список покупок успішно збережено в базу даних.";
+        TempData["PlannerSuccess"] = "План харчування та список покупок успішно збережено.";
 
         return RedirectToAction(nameof(Index));
     }
 
     private async Task FillOptionsAsync(PlannerPageViewModel model)
     {
-        var users = await _context.Users
-            .AsNoTracking()
-            .OrderBy(x => x.Name)
-            .ToListAsync();
-
         var foods = await _context.Foods
             .AsNoTracking()
             .Include(x => x.Icon)
-            .Include(x => x.Per100Unit)
             .OrderBy(x => x.Name)
             .ToListAsync();
 
-        model.UserOptions = users.Select(x => new SelectListItem
-        {
-            Value = x.Id.ToString(),
-            Text = x.Name
-        }).ToList();
-
-        model.ProteinFoodOptions = foods
+        model.ProteinFoods = foods
             .Where(x => x.Category == FoodCategory.Protein)
-            .Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
-            })
+            .Select(ToPickerFood)
             .ToList();
 
-        model.CarbFoodOptions = foods
+        model.CarbFoods = foods
             .Where(x => x.Category == FoodCategory.Carb)
-            .Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
-            })
+            .Select(ToPickerFood)
             .ToList();
 
-        model.FatFoodOptions = foods
+        model.FatFoods = foods
             .Where(x => x.Category == FoodCategory.Fat)
-            .Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = $"{(x.Icon?.Emoji ?? "🍽️")} {x.Name}"
-            })
+            .Select(ToPickerFood)
             .ToList();
+    }
+
+    private PlannerPickerFoodViewModel ToPickerFood(Food food)
+    {
+        return new PlannerPickerFoodViewModel
+        {
+            Id = food.Id,
+            Name = food.Name,
+            Emoji = food.Icon?.Emoji ?? "🍽️",
+            ProteinPer100 = food.ProteinPer100,
+            CarbPer100 = food.CarbsPer100,
+            FatPer100 = food.FatPer100
+        };
     }
 
     private async Task SetCurrentUserAsync(PlannerPageViewModel model)
@@ -147,36 +135,17 @@ public class PlannerController : Controller
             return;
         }
 
-        var firstUserId = await _context.Users
+        model.UserId = await _context.Users
             .AsNoTracking()
             .OrderBy(x => x.CreatedAt)
             .Select(x => (Guid?)x.Id)
             .FirstOrDefaultAsync();
-
-        model.UserId = firstUserId;
     }
 
     private void NormalizeMeals(PlannerPageViewModel model)
     {
-        if (model.MealsPerDay < 2)
-        {
-            model.MealsPerDay = 2;
-        }
-
-        if (model.MealsPerDay > 4)
-        {
-            model.MealsPerDay = 4;
-        }
-
-        if (model.Days < 1)
-        {
-            model.Days = 1;
-        }
-
-        if (model.Days > 7)
-        {
-            model.Days = 7;
-        }
+        model.MealsPerDay = Math.Clamp(model.MealsPerDay, 2, 4);
+        model.Days = Math.Clamp(model.Days, 1, 7);
 
         model.Meals ??= new List<PlannerMealInputViewModel>();
 
@@ -208,7 +177,7 @@ public class PlannerController : Controller
     {
         if (!model.UserId.HasValue)
         {
-            ModelState.AddModelError(string.Empty, "У базі даних не знайдено користувача для роботи конструктора.");
+            ModelState.AddModelError(string.Empty, "Не знайдено користувача для роботи конструктора.");
             return;
         }
 
@@ -242,7 +211,7 @@ public class PlannerController : Controller
     {
         if (!model.UserId.HasValue)
         {
-            ModelState.AddModelError(string.Empty, "У базі даних не знайдено користувача для збереження плану.");
+            ModelState.AddModelError(string.Empty, "Не знайдено користувача для збереження плану.");
         }
 
         if (model.ProteinTarget <= 0)
@@ -260,12 +229,8 @@ public class PlannerController : Controller
             ModelState.AddModelError("FatTarget", "Потрібно вказати ціль по жирах.");
         }
 
-        var activeMeals = GetActiveMeals(model);
-
-        for (var i = 0; i < activeMeals.Count; i++)
+        foreach (var meal in GetActiveMeals(model))
         {
-            var meal = activeMeals[i];
-
             if (!meal.ProteinFoodId.HasValue && !meal.CarbFoodId.HasValue && !meal.FatFoodId.HasValue)
             {
                 ModelState.AddModelError($"Meals[{meal.MealNo - 1}].MealName", $"Для прийому {meal.MealNo} потрібно вибрати хоча б один продукт.");
@@ -277,7 +242,7 @@ public class PlannerController : Controller
     {
         var activeMeals = GetActiveMeals(model);
 
-        var foodIds = activeMeals
+        var allIds = activeMeals
             .SelectMany(x => new[] { x.ProteinFoodId, x.CarbFoodId, x.FatFoodId })
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
@@ -288,7 +253,7 @@ public class PlannerController : Controller
             .AsNoTracking()
             .Include(x => x.Icon)
             .Include(x => x.Per100Unit)
-            .Where(x => foodIds.Contains(x.Id))
+            .Where(x => allIds.Contains(x.Id))
             .ToDictionaryAsync(x => x.Id);
 
         model.ResultMeals.Clear();
@@ -299,47 +264,154 @@ public class PlannerController : Controller
         model.ActualFat = 0;
         model.ActualKcal = 0;
 
-        var proteinPerMeal = model.ProteinTarget / activeMeals.Count;
-        var carbPerMeal = model.CarbTarget / activeMeals.Count;
-        var fatPerMeal = model.FatTarget / activeMeals.Count;
+        var proteinSlotData = new List<ProteinSlotData>();
+        var fixedProtein = 0m;
+        var fixedFatFromProtein = 0m;
+        var fixedCarbFromProtein = 0m;
+        var dynamicProteinSlots = 0;
 
-        foreach (var mealInput in activeMeals)
+        foreach (var meal in activeMeals)
+        {
+            var proteinFood = GetFood(foods, meal.ProteinFoodId);
+
+            if (proteinFood == null || IsEmptyFood(proteinFood))
+            {
+                proteinSlotData.Add(ProteinSlotData.Empty());
+                continue;
+            }
+
+            if (IsEggOrOmelette(proteinFood))
+            {
+                var weight = 165m;
+                proteinSlotData.Add(ProteinSlotData.Fixed(weight, 3m, "шт"));
+                fixedProtein += CalcMacro(weight, proteinFood.ProteinPer100);
+                fixedFatFromProtein += CalcMacro(weight, proteinFood.FatPer100);
+                fixedCarbFromProtein += CalcMacro(weight, proteinFood.CarbsPer100);
+                continue;
+            }
+
+            if (IsCottageCheese(proteinFood))
+            {
+                var weight = 200m;
+                proteinSlotData.Add(ProteinSlotData.Fixed(weight, 200m, "gram"));
+                fixedProtein += CalcMacro(weight, proteinFood.ProteinPer100);
+                fixedFatFromProtein += CalcMacro(weight, proteinFood.FatPer100);
+                fixedCarbFromProtein += CalcMacro(weight, proteinFood.CarbsPer100);
+                continue;
+            }
+
+            if (IsProteinPowder(proteinFood))
+            {
+                var weight = 30m;
+                proteinSlotData.Add(ProteinSlotData.Fixed(weight, 1m, "скуп"));
+                fixedProtein += CalcMacro(weight, proteinFood.ProteinPer100);
+                fixedFatFromProtein += CalcMacro(weight, proteinFood.FatPer100);
+                fixedCarbFromProtein += CalcMacro(weight, proteinFood.CarbsPer100);
+                continue;
+            }
+
+            dynamicProteinSlots++;
+            proteinSlotData.Add(ProteinSlotData.Dynamic());
+        }
+
+        var remainingProtein = model.ProteinTarget - fixedProtein;
+        if (remainingProtein < 0)
+        {
+            remainingProtein = 0;
+        }
+
+        var proteinPerDynamicSlot = dynamicProteinSlots > 0
+            ? remainingProtein / dynamicProteinSlots
+            : 0;
+
+        var carbDynamicSlots = activeMeals.Count(x =>
+        {
+            var food = GetFood(foods, x.CarbFoodId);
+            return food != null && !IsEmptyFood(food);
+        });
+
+        var remainingCarb = model.CarbTarget - fixedCarbFromProtein;
+        if (remainingCarb < 0)
+        {
+            remainingCarb = 0;
+        }
+
+        var carbPerSlot = carbDynamicSlots > 0
+            ? remainingCarb / carbDynamicSlots
+            : 0;
+
+        var mealsTemp = new List<MealTempData>();
+        var usedProtein = fixedProtein;
+        var usedCarb = fixedCarbFromProtein;
+        var usedFat = fixedFatFromProtein;
+
+        for (var index = 0; index < activeMeals.Count; index++)
+        {
+            var mealInput = activeMeals[index];
+
+            var proteinFood = GetFood(foods, mealInput.ProteinFoodId);
+            var carbFood = GetFood(foods, mealInput.CarbFoodId);
+            var fatFood = GetFood(foods, mealInput.FatFoodId);
+
+            var proteinItem = BuildProteinItem(proteinFood, proteinSlotData[index], proteinPerDynamicSlot);
+            var carbItem = BuildCarbItem(carbFood, carbPerSlot);
+
+            if (proteinItem != null)
+            {
+                usedProtein += proteinItem.Protein;
+                usedFat += proteinItem.Fat;
+                usedCarb += proteinItem.Carb;
+            }
+
+            if (carbItem != null)
+            {
+                usedProtein += carbItem.Protein;
+                usedFat += carbItem.Fat;
+                usedCarb += carbItem.Carb;
+            }
+
+            mealsTemp.Add(new MealTempData
+            {
+                MealNo = mealInput.MealNo,
+                MealName = mealInput.MealName,
+                ProteinItem = proteinItem,
+                CarbItem = carbItem,
+                FatFood = fatFood
+            });
+        }
+
+        var remainingFat = model.FatTarget - usedFat;
+        var dynamicFatSlots = mealsTemp.Count(x => x.FatFood != null && !IsEmptyFood(x.FatFood));
+
+        var fatOverkill = remainingFat < -5m;
+
+        if (remainingFat < 0)
+        {
+            remainingFat = 0;
+        }
+
+        var fatPerSlot = dynamicFatSlots > 0
+            ? remainingFat / dynamicFatSlots
+            : 0;
+
+        foreach (var temp in mealsTemp)
         {
             var mealResult = new PlannerMealResultViewModel
             {
-                MealNo = mealInput.MealNo,
-                MealName = mealInput.MealName
+                MealNo = temp.MealNo,
+                MealName = temp.MealName
             };
 
-            var proteinItem = BuildItem(
-                mealInput.ProteinFoodId,
-                "Білковий продукт",
-                proteinPerMeal,
-                foods,
-                x => x.ProteinPer100);
+            AddItemIfExists(mealResult, temp.ProteinItem);
+            AddItemIfExists(mealResult, temp.CarbItem);
 
-            var carbItem = BuildItem(
-                mealInput.CarbFoodId,
-                "Вуглеводний продукт",
-                carbPerMeal,
-                foods,
-                x => x.CarbsPer100);
-
-            var fatItem = BuildItem(
-                mealInput.FatFoodId,
-                "Жировий продукт",
-                fatPerMeal,
-                foods,
-                x => x.FatPer100);
-
-            AddItemIfExists(mealResult, proteinItem);
-            AddItemIfExists(mealResult, carbItem);
+            var fatItem = BuildFatItem(temp.FatFood, fatPerSlot, fatOverkill);
             AddItemIfExists(mealResult, fatItem);
 
-            mealResult.ProteinTotal = mealResult.Items.Sum(x => x.Protein);
-            mealResult.CarbTotal = mealResult.Items.Sum(x => x.Carb);
-            mealResult.FatTotal = mealResult.Items.Sum(x => x.Fat);
-            mealResult.KcalTotal = mealResult.Items.Sum(x => x.Kcal);
+            mealResult.ProteinTotal = decimal.Round(mealResult.Items.Sum(x => x.Protein), 1);
+            mealResult.CarbTotal = decimal.Round(mealResult.Items.Sum(x => x.Carb), 1);
+            mealResult.FatTotal = decimal.Round(mealResult.Items.Sum(x => x.Fat), 1);
+            mealResult.KcalTotal = decimal.Round(mealResult.Items.Sum(x => x.Kcal), 0);
 
             model.ActualProtein += mealResult.ProteinTotal;
             model.ActualCarb += mealResult.CarbTotal;
@@ -349,13 +421,24 @@ public class PlannerController : Controller
             model.ResultMeals.Add(mealResult);
         }
 
+        BuildShoppingList(model);
+
+        model.ActualProtein = decimal.Round(model.ActualProtein, 1);
+        model.ActualCarb = decimal.Round(model.ActualCarb, 1);
+        model.ActualFat = decimal.Round(model.ActualFat, 1);
+        model.ActualKcal = decimal.Round(model.ActualKcal, 0);
+        model.HasResult = true;
+    }
+
+    private void BuildShoppingList(PlannerPageViewModel model)
+    {
         var shoppingMap = new Dictionary<Guid, PlannerShoppingItemViewModel>();
 
         foreach (var meal in model.ResultMeals)
         {
             foreach (var item in meal.Items)
             {
-                if (!item.FoodId.HasValue)
+                if (!item.FoodId.HasValue || item.QuantityValue <= 0)
                 {
                     continue;
                 }
@@ -369,84 +452,20 @@ public class PlannerController : Controller
                         FoodName = item.FoodName,
                         Emoji = item.Emoji,
                         UnitName = item.UnitName,
-                        TotalQuantity = 0
+                        DisplayUnitName = item.DisplayUnitName,
+                        TotalQuantity = 0,
+                        DisplayQuantityValue = 0
                     };
                 }
 
                 shoppingMap[item.FoodId.Value].TotalQuantity += item.QuantityValue * model.Days;
+                shoppingMap[item.FoodId.Value].DisplayQuantityValue += item.DisplayQuantityValue * model.Days;
             }
         }
 
         model.ShoppingItems = shoppingMap.Values
             .OrderBy(x => x.FoodName)
             .ToList();
-
-        model.ActualProtein = decimal.Round(model.ActualProtein, 1);
-        model.ActualCarb = decimal.Round(model.ActualCarb, 1);
-        model.ActualFat = decimal.Round(model.ActualFat, 1);
-        model.ActualKcal = decimal.Round(model.ActualKcal, 0);
-        model.HasResult = true;
-    }
-
-    private PlannerMealResultItemViewModel? BuildItem(
-        Guid? foodId,
-        string roleName,
-        decimal targetMacro,
-        Dictionary<Guid, Food> foods,
-        Func<Food, decimal> macroSelector)
-    {
-        if (!foodId.HasValue)
-        {
-            return null;
-        }
-
-        if (!foods.TryGetValue(foodId.Value, out var food))
-        {
-            return null;
-        }
-
-        var macroPer100 = macroSelector(food);
-
-        decimal quantity = 0;
-        string note = string.Empty;
-
-        if (macroPer100 <= 0)
-        {
-            note = "У цьому продукті немає потрібного макронутрієнта для автоматичного розрахунку.";
-        }
-        else
-        {
-            quantity = decimal.Round(targetMacro / macroPer100 * 100m, 0, MidpointRounding.AwayFromZero);
-        }
-
-        var protein = decimal.Round(quantity * food.ProteinPer100 / 100m, 1);
-        var carb = decimal.Round(quantity * food.CarbsPer100 / 100m, 1);
-        var fat = decimal.Round(quantity * food.FatPer100 / 100m, 1);
-        var kcal = decimal.Round(quantity * food.KcalPer100 / 100m, 0);
-
-        return new PlannerMealResultItemViewModel
-        {
-            FoodId = food.Id,
-            QuantityUnitId = food.Per100UnitId,
-            RoleName = roleName,
-            FoodName = food.Name,
-            Emoji = food.Icon?.Emoji ?? "🍽️",
-            UnitName = food.Per100Unit.Name,
-            QuantityValue = quantity,
-            Protein = protein,
-            Carb = carb,
-            Fat = fat,
-            Kcal = kcal,
-            Note = note
-        };
-    }
-
-    private void AddItemIfExists(PlannerMealResultViewModel mealResult, PlannerMealResultItemViewModel? item)
-    {
-        if (item != null)
-        {
-            mealResult.Items.Add(item);
-        }
     }
 
     private async Task<(Guid planId, Guid shopListId)> SavePlanAsync(PlannerPageViewModel model)
@@ -514,7 +533,7 @@ public class PlannerController : Controller
 
         _context.ShopLists.Add(shopList);
 
-        foreach (var shoppingItem in model.ShoppingItems)
+        foreach (var shoppingItem in model.ShoppingItems.Where(x => x.TotalQuantity > 0))
         {
             var entity = new ShopItem
             {
@@ -531,5 +550,248 @@ public class PlannerController : Controller
         await _context.SaveChangesAsync();
 
         return (plan.Id, shopList.Id);
+    }
+
+    private Food? GetFood(Dictionary<Guid, Food> foods, Guid? foodId)
+    {
+        if (!foodId.HasValue)
+        {
+            return null;
+        }
+
+        return foods.TryGetValue(foodId.Value, out var food) ? food : null;
+    }
+
+    private bool IsEmptyFood(Food food)
+    {
+        var name = food.Name.Trim().ToLower();
+        return name.Contains("без м’яса") || name.Contains("без масла") || name.Contains("без мяса");
+    }
+
+    private bool IsEggOrOmelette(Food food)
+    {
+        var name = food.Name.Trim().ToLower();
+        return name.Contains("яйця") || name.Contains("омлет") || name.Contains("яйца");
+    }
+
+    private bool IsCottageCheese(Food food)
+    {
+        var name = food.Name.Trim().ToLower();
+        return name.Contains("сир кисломолочний") || name.Contains("творог");
+    }
+
+    private bool IsProteinPowder(Food food)
+    {
+        var name = food.Name.Trim().ToLower();
+        return name.Contains("протеїн") || name.Contains("протеин") || name.Contains("whey");
+    }
+
+    private decimal CalcMacro(decimal weight, decimal macroPer100)
+    {
+        return decimal.Round((weight / 100m) * macroPer100, 1);
+    }
+
+    private PlannerMealResultItemViewModel? BuildProteinItem(Food? food, ProteinSlotData slotData, decimal targetProtein)
+    {
+        if (food == null || slotData.Type == ProteinSlotType.Empty)
+        {
+            return null;
+        }
+
+        decimal weight;
+        decimal displayQuantity;
+        string displayUnit;
+
+        if (slotData.Type == ProteinSlotType.Fixed)
+        {
+            weight = slotData.WeightGrams;
+            displayQuantity = slotData.DisplayQuantity;
+            displayUnit = slotData.DisplayUnit;
+        }
+        else
+        {
+            if (food.ProteinPer100 <= 0)
+            {
+                return new PlannerMealResultItemViewModel
+                {
+                    FoodId = food.Id,
+                    QuantityUnitId = food.Per100UnitId,
+                    RoleName = "Білковий продукт",
+                    FoodName = food.Name,
+                    Emoji = food.Icon?.Emoji ?? "🍽️",
+                    UnitName = food.Per100Unit.Name,
+                    DisplayUnitName = food.Per100Unit.Name,
+                    QuantityValue = 0,
+                    DisplayQuantityValue = 0,
+                    Protein = 0,
+                    Carb = 0,
+                    Fat = 0,
+                    Kcal = 0,
+                    Note = "У продукті немає достатньо білка для автоматичного розрахунку."
+                };
+            }
+
+            weight = decimal.Round(targetProtein / food.ProteinPer100 * 100m, 0, MidpointRounding.AwayFromZero);
+            displayQuantity = weight;
+            displayUnit = food.Per100Unit.Name;
+        }
+
+        return BuildItemFromWeight(food, "Білковий продукт", weight, displayQuantity, displayUnit, string.Empty);
+    }
+
+    private PlannerMealResultItemViewModel? BuildCarbItem(Food? food, decimal targetCarb)
+    {
+        if (food == null || IsEmptyFood(food))
+        {
+            return null;
+        }
+
+        if (food.CarbsPer100 <= 0)
+        {
+            return new PlannerMealResultItemViewModel
+            {
+                FoodId = food.Id,
+                QuantityUnitId = food.Per100UnitId,
+                RoleName = "Вуглеводний продукт",
+                FoodName = food.Name,
+                Emoji = food.Icon?.Emoji ?? "🍽️",
+                UnitName = food.Per100Unit.Name,
+                DisplayUnitName = food.Per100Unit.Name,
+                QuantityValue = 0,
+                DisplayQuantityValue = 0,
+                Protein = 0,
+                Carb = 0,
+                Fat = 0,
+                Kcal = 0,
+                Note = "У продукті немає достатньо вуглеводів для автоматичного розрахунку."
+            };
+        }
+
+        var weight = decimal.Round(targetCarb / food.CarbsPer100 * 100m, 0, MidpointRounding.AwayFromZero);
+
+        return BuildItemFromWeight(
+            food,
+            "Вуглеводний продукт",
+            weight,
+            weight,
+            food.Per100Unit.Name,
+            string.Empty);
+    }
+
+    private PlannerMealResultItemViewModel? BuildFatItem(Food? food, decimal targetFat, bool fatOverkill)
+    {
+        if (food == null || IsEmptyFood(food))
+        {
+            return null;
+        }
+
+        if (fatOverkill)
+        {
+            return BuildItemFromWeight(
+                food,
+                "Жировий продукт",
+                0,
+                0,
+                food.Per100Unit.Name,
+                "Додатковий жир не потрібен: ціль уже перекрита іншими продуктами.");
+        }
+
+        if (food.FatPer100 <= 0)
+        {
+            return BuildItemFromWeight(
+                food,
+                "Жировий продукт",
+                0,
+                0,
+                food.Per100Unit.Name,
+                "У продукті немає достатньо жирів для автоматичного розрахунку.");
+        }
+
+        var weight = decimal.Round(targetFat / food.FatPer100 * 100m, 0, MidpointRounding.AwayFromZero);
+
+        return BuildItemFromWeight(
+            food,
+            "Жировий продукт",
+            weight,
+            weight,
+            food.Per100Unit.Name,
+            string.Empty);
+    }
+
+    private PlannerMealResultItemViewModel BuildItemFromWeight(
+        Food food,
+        string roleName,
+        decimal weight,
+        decimal displayQuantity,
+        string displayUnitName,
+        string note)
+    {
+        var protein = CalcMacro(weight, food.ProteinPer100);
+        var carb = CalcMacro(weight, food.CarbsPer100);
+        var fat = CalcMacro(weight, food.FatPer100);
+        var kcal = CalcMacro(weight, food.KcalPer100);
+
+        return new PlannerMealResultItemViewModel
+        {
+            FoodId = food.Id,
+            QuantityUnitId = food.Per100UnitId,
+            RoleName = roleName,
+            FoodName = food.Name,
+            Emoji = food.Icon?.Emoji ?? "🍽️",
+            UnitName = food.Per100Unit.Name,
+            DisplayUnitName = displayUnitName,
+            QuantityValue = weight,
+            DisplayQuantityValue = displayQuantity,
+            Protein = protein,
+            Carb = carb,
+            Fat = fat,
+            Kcal = kcal,
+            Note = note
+        };
+    }
+
+    private void AddItemIfExists(PlannerMealResultViewModel mealResult, PlannerMealResultItemViewModel? item)
+    {
+        if (item != null)
+        {
+            mealResult.Items.Add(item);
+        }
+    }
+
+    private sealed class MealTempData
+    {
+        public int MealNo { get; set; }
+        public string MealName { get; set; } = string.Empty;
+        public PlannerMealResultItemViewModel? ProteinItem { get; set; }
+        public PlannerMealResultItemViewModel? CarbItem { get; set; }
+        public Food? FatFood { get; set; }
+    }
+
+    private sealed class ProteinSlotData
+    {
+        public ProteinSlotType Type { get; private set; }
+        public decimal WeightGrams { get; private set; }
+        public decimal DisplayQuantity { get; private set; }
+        public string DisplayUnit { get; private set; } = "gram";
+
+        public static ProteinSlotData Empty() => new() { Type = ProteinSlotType.Empty };
+
+        public static ProteinSlotData Dynamic() => new() { Type = ProteinSlotType.Dynamic };
+
+        public static ProteinSlotData Fixed(decimal weightGrams, decimal displayQuantity, string displayUnit)
+            => new()
+            {
+                Type = ProteinSlotType.Fixed,
+                WeightGrams = weightGrams,
+                DisplayQuantity = displayQuantity,
+                DisplayUnit = displayUnit
+            };
+    }
+
+    private enum ProteinSlotType
+    {
+        Empty = 0,
+        Dynamic = 1,
+        Fixed = 2
     }
 }
