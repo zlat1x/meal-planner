@@ -28,10 +28,6 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Foods" asp-action="Index">Продукти</a>
-                        </li>
-
-                        <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="About">Про програму</a>
                         </li>
 
@@ -40,15 +36,16 @@
                                 Керування даними
                             </a>
                             <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Foods" asp-action="Index">Продукти</a></li>
                                 <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Користувачі</a></li>
                                 <li><a class="dropdown-item" asp-controller="Profiles" asp-action="Index">Профілі</a></li>
                                 <li><a class="dropdown-item" asp-controller="Configurations" asp-action="Index">Конфігурації</a></li>
                                 <li><a class="dropdown-item" asp-controller="Macros" asp-action="Index">Макроси</a></li>
                                 <li><a class="dropdown-item" asp-controller="MacroLogs" asp-action="Index">Журнал змін</a></li>
                                 <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Plans" asp-action="Index">Плани</a></li>
                                 <li><a class="dropdown-item" asp-controller="Meals" asp-action="Index">Прийоми їжі</a></li>
                                 <li><a class="dropdown-item" asp-controller="MealItems" asp-action="Index">Позиції у плані</a></li>
-                                <li><a class="dropdown-item" asp-controller="Plans" asp-action="Index">Плани</a></li>
                                 <li><a class="dropdown-item" asp-controller="ShopLists" asp-action="Index">Списки покупок</a></li>
                                 <li><a class="dropdown-item" asp-controller="ShopItems" asp-action="Index">Позиції списку</a></li>
                                 <li><a class="dropdown-item" asp-controller="Exports" asp-action="Index">Експорти</a></li>
@@ -60,7 +57,7 @@
                     </ul>
 
                     <div class="navbar-text app-navbar-text d-none d-xl-block">
-                        Конструктор меню та список покупок
+                        Конструктор меню, список покупок та експорт
                     </div>
                 </div>
             </div>
