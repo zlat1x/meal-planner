@@ -58,11 +58,11 @@ public class FoodsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Food food)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Icon"); 
-        ModelState.Remove("Per100Unit"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Icon");
+        ModelState.Remove("Per100Unit");
         ModelState.Remove("MealItems");
-        ModelState.Remove("ShopItems"); 
+        ModelState.Remove("ShopItems");
 
         await ValidateFoodAsync(food);
 
@@ -103,12 +103,12 @@ public class FoodsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Food food)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Icon"); 
-        ModelState.Remove("Per100Unit"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Icon");
+        ModelState.Remove("Per100Unit");
         ModelState.Remove("MealItems");
-        ModelState.Remove("ShopItems"); 
-        
+        ModelState.Remove("ShopItems");
+
         if (id != food.Id)
         {
             return NotFound();
@@ -198,19 +198,19 @@ public class FoodsController : Controller
     {
         if (string.IsNullOrWhiteSpace(food.Name))
         {
-            ModelState.AddModelError("Name", "Name is required.");
+            ModelState.AddModelError("Name", "Потрібно вказати назву продукту.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == food.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         var unitExists = await _context.Units.AnyAsync(x => x.Id == food.Per100UnitId);
         if (!unitExists)
         {
-            ModelState.AddModelError("Per100UnitId", "Per 100 unit is required.");
+            ModelState.AddModelError("Per100UnitId", "Потрібно вибрати одиницю вимірювання.");
         }
 
         if (food.IconId.HasValue)
@@ -218,7 +218,7 @@ public class FoodsController : Controller
             var iconExists = await _context.Icons.AnyAsync(x => x.Id == food.IconId.Value);
             if (!iconExists)
             {
-                ModelState.AddModelError("IconId", "Selected icon does not exist.");
+                ModelState.AddModelError("IconId", "Вибрана іконка не існує.");
             }
         }
     }

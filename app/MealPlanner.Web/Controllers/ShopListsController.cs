@@ -56,14 +56,14 @@ public class ShopListsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ShopList shopList)
     {
-        ModelState.Remove("Plan"); 
-        ModelState.Remove("Items"); 
+        ModelState.Remove("Plan");
+        ModelState.Remove("Items");
         ModelState.Remove("Exports");
 
         var planExists = await _context.Plans.AnyAsync(x => x.Id == shopList.PlanId);
         if (!planExists)
         {
-            ModelState.AddModelError("PlanId", "Plan is required.");
+            ModelState.AddModelError("PlanId", "Потрібно вибрати план.");
         }
 
         if (!ModelState.IsValid)
@@ -103,10 +103,10 @@ public class ShopListsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, ShopList shopList)
     {
-        ModelState.Remove("Plan"); 
-        ModelState.Remove("Items"); 
+        ModelState.Remove("Plan");
+        ModelState.Remove("Items");
         ModelState.Remove("Exports");
-        
+
         if (id != shopList.Id)
         {
             return NotFound();
@@ -115,7 +115,7 @@ public class ShopListsController : Controller
         var planExists = await _context.Plans.AnyAsync(x => x.Id == shopList.PlanId);
         if (!planExists)
         {
-            ModelState.AddModelError("PlanId", "Plan is required.");
+            ModelState.AddModelError("PlanId", "Потрібно вибрати план.");
         }
 
         if (!ModelState.IsValid)
@@ -186,7 +186,7 @@ public class ShopListsController : Controller
         var items = plans.Select(x => new
         {
             x.Id,
-            Text = $"{x.User.Name} | {x.Status} | {x.Days} days"
+            Text = $"{x.User.Name} | {x.Status} | {x.Days} днів"
         });
 
         ViewBag.PlanId = new SelectList(items, "Id", "Text", selectedPlanId);

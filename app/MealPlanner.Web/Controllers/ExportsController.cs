@@ -58,8 +58,8 @@ public class ExportsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Export exportItem)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Plan"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Plan");
         ModelState.Remove("List");
 
         await ValidateExportAsync(exportItem);
@@ -101,10 +101,10 @@ public class ExportsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Export exportItem)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Plan"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Plan");
         ModelState.Remove("List");
-        
+
         if (id != exportItem.Id)
         {
             return NotFound();
@@ -194,13 +194,13 @@ public class ExportsController : Controller
         var planItems = plans.Select(x => new
         {
             x.Id,
-            Text = $"{x.User.Name} | {x.Status} | {x.Days} days"
+            Text = $"{x.User.Name} | {x.Status} | {x.Days} днів"
         });
 
         var listItems = shopLists.Select(x => new
         {
             x.Id,
-            Text = $"{x.Plan.User.Name} | list for {x.Days} days"
+            Text = $"{x.Plan.User.Name} | список на {x.Days} днів"
         });
 
         ViewBag.UserId = new SelectList(users, "Id", "Name", selectedUserId);
@@ -212,18 +212,18 @@ public class ExportsController : Controller
     {
         if (string.IsNullOrWhiteSpace(exportItem.Type))
         {
-            ModelState.AddModelError("Type", "Type is required.");
+            ModelState.AddModelError("Type", "Потрібно вказати тип експорту.");
         }
 
         if (string.IsNullOrWhiteSpace(exportItem.FileUrl))
         {
-            ModelState.AddModelError("FileUrl", "File url is required.");
+            ModelState.AddModelError("FileUrl", "Потрібно вказати шлях до файлу.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == exportItem.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (exportItem.PlanId.HasValue)
@@ -231,7 +231,7 @@ public class ExportsController : Controller
             var planExists = await _context.Plans.AnyAsync(x => x.Id == exportItem.PlanId.Value);
             if (!planExists)
             {
-                ModelState.AddModelError("PlanId", "Selected plan does not exist.");
+                ModelState.AddModelError("PlanId", "Вибраний план не існує.");
             }
         }
 
@@ -240,7 +240,7 @@ public class ExportsController : Controller
             var listExists = await _context.ShopLists.AnyAsync(x => x.Id == exportItem.ListId.Value);
             if (!listExists)
             {
-                ModelState.AddModelError("ListId", "Selected shop list does not exist.");
+                ModelState.AddModelError("ListId", "Вибраний список покупок не існує.");
             }
         }
     }

@@ -62,7 +62,7 @@ public class ConfigurationsController : Controller
         var userExists = await _context.Users.AnyAsync(x => x.Id == configuration.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (configuration.ActiveMacroId.HasValue)
@@ -70,13 +70,13 @@ public class ConfigurationsController : Controller
             var macroExists = await _context.Macros.AnyAsync(x => x.Id == configuration.ActiveMacroId.Value);
             if (!macroExists)
             {
-                ModelState.AddModelError("ActiveMacroId", "Selected macro does not exist.");
+                ModelState.AddModelError("ActiveMacroId", "Вибраний макрос не існує.");
             }
         }
 
         if (string.IsNullOrWhiteSpace(configuration.Lang))
         {
-            ModelState.AddModelError("Lang", "Language is required.");
+            ModelState.AddModelError("Lang", "Потрібно вказати мову.");
         }
 
         if (!ModelState.IsValid)
@@ -126,7 +126,7 @@ public class ConfigurationsController : Controller
         var userExists = await _context.Users.AnyAsync(x => x.Id == configuration.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (configuration.ActiveMacroId.HasValue)
@@ -134,13 +134,13 @@ public class ConfigurationsController : Controller
             var macroExists = await _context.Macros.AnyAsync(x => x.Id == configuration.ActiveMacroId.Value);
             if (!macroExists)
             {
-                ModelState.AddModelError("ActiveMacroId", "Selected macro does not exist.");
+                ModelState.AddModelError("ActiveMacroId", "Вибраний макрос не існує.");
             }
         }
 
         if (string.IsNullOrWhiteSpace(configuration.Lang))
         {
-            ModelState.AddModelError("Lang", "Language is required.");
+            ModelState.AddModelError("Lang", "Потрібно вказати мову.");
         }
 
         if (!ModelState.IsValid)

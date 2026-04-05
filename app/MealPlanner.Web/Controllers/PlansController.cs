@@ -56,9 +56,9 @@ public class PlansController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Plan plan)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Macro"); 
-        ModelState.Remove("Meals"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Macro");
+        ModelState.Remove("Meals");
         ModelState.Remove("ShopLists");
         ModelState.Remove("Exports");
 
@@ -101,12 +101,12 @@ public class PlansController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Plan plan)
     {
-        ModelState.Remove("User"); 
-        ModelState.Remove("Macro"); 
-        ModelState.Remove("Meals"); 
+        ModelState.Remove("User");
+        ModelState.Remove("Macro");
+        ModelState.Remove("Meals");
         ModelState.Remove("ShopLists");
         ModelState.Remove("Exports");
-        
+
         if (id != plan.Id)
         {
             return NotFound();
@@ -187,13 +187,13 @@ public class PlansController : Controller
     {
         if (string.IsNullOrWhiteSpace(plan.Status))
         {
-            ModelState.AddModelError("Status", "Status is required.");
+            ModelState.AddModelError("Status", "Потрібно вказати статус плану.");
         }
 
         var userExists = await _context.Users.AnyAsync(x => x.Id == plan.UserId);
         if (!userExists)
         {
-            ModelState.AddModelError("UserId", "User is required.");
+            ModelState.AddModelError("UserId", "Потрібно вибрати користувача.");
         }
 
         if (plan.MacroId.HasValue)
@@ -201,7 +201,7 @@ public class PlansController : Controller
             var macroExists = await _context.Macros.AnyAsync(x => x.Id == plan.MacroId.Value);
             if (!macroExists)
             {
-                ModelState.AddModelError("MacroId", "Selected macro does not exist.");
+                ModelState.AddModelError("MacroId", "Вибраний макрос не існує.");
             }
         }
     }
