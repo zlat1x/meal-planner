@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model MealPlanner.Web.Models.PlannerPageViewModel
 
 @{
@@ -90,6 +91,18 @@
                 <div class="planner-meals-grid">
                     @for (var i = 0; i < Model.Meals.Count; i++)
                     {
+                        var selectedProtein = Model.Meals[i].ProteinFoodId.HasValue
+                            ? Model.ProteinFoods.FirstOrDefault(x => x.Id == Model.Meals[i].ProteinFoodId.Value)
+                            : null;
+
+                        var selectedCarb = Model.Meals[i].CarbFoodId.HasValue
+                            ? Model.CarbFoods.FirstOrDefault(x => x.Id == Model.Meals[i].CarbFoodId.Value)
+                            : null;
+
+                        var selectedFat = Model.Meals[i].FatFoodId.HasValue
+                            ? Model.FatFoods.FirstOrDefault(x => x.Id == Model.Meals[i].FatFoodId.Value)
+                            : null;
+
                         <div class="planner-meal-shell" data-meal-card data-meal-no="@Model.Meals[i].MealNo">
                             <div class="card planner-meal-card h-100">
                                 <div class="card-body">
@@ -109,23 +122,56 @@
                                     <div class="planner-food-role-grid">
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Білковий продукт</div>
-                                            <select asp-for="Meals[@i].ProteinFoodId" class="form-select planner-food-select" asp-items="Model.ProteinFoodOptions">
-                                                <option value="">Не вибрано</option>
-                                            </select>
+
+                                            <input asp-for="Meals[@i].ProteinFoodId" type="hidden" id="proteinInput_@i" /> @* оце додали *@
+
+                                            <button type="button"
+                                                    class="planner-picker-btn"
+                                                    data-picker-open="protein"
+                                                    data-target-input="proteinInput_@i"
+                                                    data-target-label="proteinLabel_@i">
+                                                <span id="proteinLabel_@i">
+                                                    @(selectedProtein != null
+                                                        ? $"{selectedProtein.Emoji} {selectedProtein.Name}"
+                                                        : "Не вибрано")
+                                                </span>
+                                            </button>
                                         </div>
 
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Вуглеводний продукт</div>
-                                            <select asp-for="Meals[@i].CarbFoodId" class="form-select planner-food-select" asp-items="Model.CarbFoodOptions">
-                                                <option value="">Не вибрано</option>
-                                            </select>
+
+                                            <input asp-for="Meals[@i].CarbFoodId" type="hidden" id="carbInput_@i" /> @* оце додали *@
+
+                                            <button type="button"
+                                                    class="planner-picker-btn planner-picker-btn-carb"
+                                                    data-picker-open="carb"
+                                                    data-target-input="carbInput_@i"
+                                                    data-target-label="carbLabel_@i">
+                                                <span id="carbLabel_@i">
+                                                    @(selectedCarb != null
+                                                        ? $"{selectedCarb.Emoji} {selectedCarb.Name}"
+                                                        : "Не вибрано")
+                                                </span>
+                                            </button>
                                         </div>
 
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Жировий продукт</div>
-                                            <select asp-for="Meals[@i].FatFoodId" class="form-select planner-food-select" asp-items="Model.FatFoodOptions">
-                                                <option value="">Не вибрано</option>
-                                            </select>
+
+                                            <input asp-for="Meals[@i].FatFoodId" type="hidden" id="fatInput_@i" /> @* оце додали *@
+
+                                            <button type="button"
+                                                    class="planner-picker-btn planner-picker-btn-fat"
+                                                    data-picker-open="fat"
+                                                    data-target-input="fatInput_@i"
+                                                    data-target-label="fatLabel_@i">
+                                                <span id="fatLabel_@i">
+                                                    @(selectedFat != null
+                                                        ? $"{selectedFat.Emoji} {selectedFat.Name}"
+                                                        : "Не вибрано")
+                                                </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -258,6 +304,7 @@
                 }
             </div>
         </div>
+
         <div class="card planner-export-card mt-4">
             <div class="card-body">
                 <div class="section-header mb-3">
@@ -269,6 +316,96 @@
             </div>
         </div>
     }
+</div>
+
+<div class="modal fade" id="proteinPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content planner-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Обери білковий продукт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="planner-modal-clear-btn" data-picker-clear="protein">Очистити вибір</button>
+
+                <div class="planner-modal-list">
+                    @foreach (var food in Model.ProteinFoods)
+                    {
+                        <button type="button"
+                                class="planner-modal-item"
+                                data-picker-select="protein"
+                                data-food-id="@food.Id"
+                                data-food-label="@($"{food.Emoji} {food.Name}")">
+                            <div class="planner-modal-item-name">@food.Emoji @food.Name</div>
+                            <div class="planner-modal-item-meta">
+                                Б @food.ProteinPer100 / Ж @food.FatPer100 / В @food.CarbPer100
+                            </div>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="carbPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content planner-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Обери вуглеводний продукт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="planner-modal-clear-btn" data-picker-clear="carb">Очистити вибір</button>
+
+                <div class="planner-modal-list">
+                    @foreach (var food in Model.CarbFoods)
+                    {
+                        <button type="button"
+                                class="planner-modal-item"
+                                data-picker-select="carb"
+                                data-food-id="@food.Id"
+                                data-food-label="@($"{food.Emoji} {food.Name}")">
+                            <div class="planner-modal-item-name">@food.Emoji @food.Name</div>
+                            <div class="planner-modal-item-meta">
+                                Б @food.ProteinPer100 / Ж @food.FatPer100 / В @food.CarbPer100
+                            </div>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fatPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content planner-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Обери жировий продукт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="planner-modal-clear-btn" data-picker-clear="fat">Очистити вибір</button>
+
+                <div class="planner-modal-list">
+                    @foreach (var food in Model.FatFoods)
+                    {
+                        <button type="button"
+                                class="planner-modal-item"
+                                data-picker-select="fat"
+                                data-food-id="@food.Id"
+                                data-food-label="@($"{food.Emoji} {food.Name}")">
+                            <div class="planner-modal-item-name">@food.Emoji @food.Name</div>
+                            <div class="planner-modal-item-meta">
+                                Б @food.ProteinPer100 / Ж @food.FatPer100 / В @food.CarbPer100
+                            </div>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
