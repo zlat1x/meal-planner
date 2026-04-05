@@ -140,8 +140,17 @@ public static class MealPlannerSeed
     private static List<Food> CreateFoods(Guid userId, Guid gramUnitId, Dictionary<string, Guid> iconMap)
     {
         var now = DateTime.UtcNow;
-
         var foods = new List<Food>();
+
+        Guid? GetIconId(string iconCode)
+        {
+            if (iconMap.TryGetValue(iconCode, out var iconId))
+            {
+                return iconId;
+            }
+
+            return null;
+        }
 
         void Add(string name, FoodCategory category, decimal p, decimal c, decimal f, string iconCode, bool isCustom = false)
         {
@@ -151,7 +160,7 @@ public static class MealPlannerSeed
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                IconId = iconMap[iconCode],
+                IconId = GetIconId(iconCode),
                 Per100UnitId = gramUnitId,
                 Name = name,
                 Category = category,
