@@ -788,3 +788,136 @@ a:hover {
         align-items: flex-start;
     }
 }
+
+.planner-picker-btn {
+    width: 100%;
+    min-height: 58px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.2s ease;
+}
+
+.planner-picker-btn:hover {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.08);
+}
+
+.planner-picker-btn::after {
+    content: "▾";
+    font-size: 1rem;
+    color: #475569;
+    margin-left: 1rem;
+}
+
+.planner-picker-btn-carb {
+    border-color: #c7e7fb;
+}
+
+.planner-picker-btn-fat {
+    border-color: #f3e1b9;
+}
+
+.planner-picker-btn span {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.planner-modal-content {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+}
+
+.planner-modal-content .modal-header {
+    border-bottom: none;
+    padding: 1.3rem 1.5rem 0.8rem;
+}
+
+.planner-modal-content .modal-body {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.planner-modal-clear-btn {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    background: #f8fbff;
+    border-radius: 16px;
+    padding: 0.95rem 1rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 1rem;
+    transition: 0.2s ease;
+}
+
+.planner-modal-clear-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.planner-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.planner-modal-item {
+    width: 100%;
+    text-align: left;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1rem 1rem;
+    transition: 0.2s ease;
+}
+
+.planner-modal-item:hover {
+    border-color: #2563eb;
+    background: #f8fbff;
+}
+
+.planner-modal-item-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.planner-modal-item-meta {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.planner-export-card {
+    border-radius: 18px;
+}
+
+.planner-export-textarea {
+    min-height: 260px;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.96rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .planner-modal-content .modal-header,
+    .planner-modal-content .modal-body {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .planner-picker-btn {
+        min-height: 54px;
+    }
+}
