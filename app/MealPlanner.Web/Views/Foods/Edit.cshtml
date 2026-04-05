@@ -1,84 +1,75 @@
 @model MealPlanner.Domain.Entities.Food
 
 @{
-    ViewData["Title"] = "Edit food";
+    ViewData["Title"] = "Редагувати продукт";
 }
 
-<h1>Edit food</h1>
-
-<hr />
+<h1>Редагувати продукт</h1>
+<p class="page-subtitle mb-4">Оновлення інформації про продукт.</p>
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-lg-8">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="UpdatedAt" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="UserId" class="form-label">User</label>
-                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
-                    <option value="">Select user</option>
-                </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <label asp-for="UserId" class="form-label">Користувач</label>
+                <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId"></select>
             </div>
 
             <div class="mb-3">
-                <label asp-for="IconId" class="form-label">Icon</label>
-                <select asp-for="IconId" asp-items="ViewBag.IconId" class="form-select">
-                    <option value="">No icon</option>
+                <label asp-for="IconId" class="form-label">Іконка</label>
+                <select asp-for="IconId" class="form-select" asp-items="ViewBag.IconId">
+                    <option value="">Не вибрано</option>
                 </select>
-                <span asp-validation-for="IconId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Per100UnitId" class="form-label">Per 100 unit</label>
-                <select asp-for="Per100UnitId" asp-items="ViewBag.Per100UnitId" class="form-select">
-                    <option value="">Select unit</option>
-                </select>
-                <span asp-validation-for="Per100UnitId" class="text-danger"></span>
+                <label asp-for="Per100UnitId" class="form-label">Одиниця на 100</label>
+                <select asp-for="Per100UnitId" class="form-select" asp-items="ViewBag.Per100UnitId"></select>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
+                <label asp-for="Name" class="form-label">Назва</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="ProteinPer100" class="form-label"></label>
-                <input asp-for="ProteinPer100" class="form-control" />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ProteinPer100" class="form-label">Білки / 100</label>
+                    <input asp-for="ProteinPer100" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CarbsPer100" class="form-label">Вуглеводи / 100</label>
+                    <input asp-for="CarbsPer100" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FatPer100" class="form-label">Жири / 100</label>
+                    <input asp-for="FatPer100" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="KcalPer100" class="form-label">Ккал / 100</label>
+                    <input asp-for="KcalPer100" class="form-control" />
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="CarbsPer100" class="form-label"></label>
-                <input asp-for="CarbsPer100" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="FatPer100" class="form-label"></label>
-                <input asp-for="FatPer100" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="KcalPer100" class="form-label"></label>
-                <input asp-for="KcalPer100" class="form-control" />
-            </div>
-
-            <div class="form-check mb-3">
+            <div class="form-check mb-4">
                 <input asp-for="IsCustom" class="form-check-input" />
-                <label asp-for="IsCustom" class="form-check-label"></label>
+                <label asp-for="IsCustom" class="form-check-label">Користувацький продукт</label>
             </div>
 
-            <div class="mb-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

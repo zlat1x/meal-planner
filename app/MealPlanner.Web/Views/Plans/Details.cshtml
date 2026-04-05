@@ -1,32 +1,34 @@
 @model MealPlanner.Domain.Entities.Plan
 
 @{
-    ViewData["Title"] = "Plan details";
+    ViewData["Title"] = "Деталі плану";
 }
 
-<h1>Plan details</h1>
+<h1>Деталі плану харчування</h1>
+<p class="page-subtitle mb-4">Інформація про вибраний план.</p>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">User</dt>
-        <dd class="col-sm-10">@Model.User.Name</dd>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Користувач</dt>
+            <dd class="col-sm-9">@Model.User.Name</dd>
 
-        <dt class="col-sm-2">Macro</dt>
-        <dd class="col-sm-10">@(Model.Macro != null ? Model.Macro.Mode : "-")</dd>
+            <dt class="col-sm-3">Макрос</dt>
+            <dd class="col-sm-9">@(Model.Macro?.Mode ?? "Не вибрано")</dd>
 
-        <dt class="col-sm-2">Days</dt>
-        <dd class="col-sm-10">@Model.Days</dd>
+            <dt class="col-sm-3">Кількість днів</dt>
+            <dd class="col-sm-9">@Model.Days</dd>
 
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Model.Status</dd>
+            <dt class="col-sm-3">Статус</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
 
-        <dt class="col-sm-2">Created at</dt>
-        <dd class="col-sm-10">@Model.CreatedAt</dd>
-    </dl>
-</div>
+            <dt class="col-sm-3">Створено</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+        </dl>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        </div>
+    </div>
 </div>

@@ -1,26 +1,28 @@
 @model MealPlanner.Domain.Entities.ShopList
 
 @{
-    ViewData["Title"] = "Delete shop list";
+    ViewData["Title"] = "Видалити список покупок";
 }
 
-<h1>Delete shop list</h1>
+<h1>Видалити список покупок</h1>
+<p class="page-subtitle mb-4 text-danger">Підтвердь видалення списку покупок.</p>
 
-<h3>Are you sure you want to delete this shop list?</h3>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Користувач</dt>
+            <dd class="col-sm-9">@Model.Plan.User.Name</dd>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Plan user</dt>
-        <dd class="col-sm-10">@Model.Plan.User.Name</dd>
+            <dt class="col-sm-3">Кількість днів</dt>
+            <dd class="col-sm-9">@Model.Days</dd>
+        </dl>
 
-        <dt class="col-sm-2">Days</dt>
-        <dd class="col-sm-10">@Model.Days</dd>
-    </dl>
-
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-secondary">Back to list</a>
-    </form>
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-danger">Видалити</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+            </div>
+        </form>
+    </div>
 </div>

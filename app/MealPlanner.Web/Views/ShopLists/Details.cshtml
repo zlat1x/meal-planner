@@ -1,29 +1,31 @@
 @model MealPlanner.Domain.Entities.ShopList
 
 @{
-    ViewData["Title"] = "Shop list details";
+    ViewData["Title"] = "Деталі списку покупок";
 }
 
-<h1>Shop list details</h1>
+<h1>Деталі списку покупок</h1>
+<p class="page-subtitle mb-4">Інформація про вибраний список покупок.</p>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Plan user</dt>
-        <dd class="col-sm-10">@Model.Plan.User.Name</dd>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Користувач</dt>
+            <dd class="col-sm-9">@Model.Plan.User.Name</dd>
 
-        <dt class="col-sm-2">Plan status</dt>
-        <dd class="col-sm-10">@Model.Plan.Status</dd>
+            <dt class="col-sm-3">Статус плану</dt>
+            <dd class="col-sm-9">@Model.Plan.Status</dd>
 
-        <dt class="col-sm-2">Days</dt>
-        <dd class="col-sm-10">@Model.Days</dd>
+            <dt class="col-sm-3">Кількість днів</dt>
+            <dd class="col-sm-9">@Model.Days</dd>
 
-        <dt class="col-sm-2">Created at</dt>
-        <dd class="col-sm-10">@Model.CreatedAt</dd>
-    </dl>
-</div>
+            <dt class="col-sm-3">Створено</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+        </dl>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        </div>
+    </div>
 </div>

@@ -1,42 +1,38 @@
 @model MealPlanner.Domain.Entities.ShopList
 
 @{
-    ViewData["Title"] = "Edit shop list";
+    ViewData["Title"] = "Редагувати список покупок";
 }
 
-<h1>Edit shop list</h1>
-
-<hr />
+<h1>Редагувати список покупок</h1>
+<p class="page-subtitle mb-4">Оновлення параметрів списку покупок.</p>
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-lg-8">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="PlanId" class="form-label">Plan</label>
-                <select asp-for="PlanId" asp-items="ViewBag.PlanId" class="form-select">
-                    <option value="">Select plan</option>
-                </select>
-                <span asp-validation-for="PlanId" class="text-danger"></span>
+                <label asp-for="PlanId" class="form-label">План</label>
+                <select asp-for="PlanId" class="form-select" asp-items="ViewBag.PlanId"></select>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Days" class="form-label"></label>
+            <div class="mb-4">
+                <label asp-for="Days" class="form-label">Кількість днів</label>
                 <input asp-for="Days" class="form-control" />
             </div>
 
-            <div class="mb-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

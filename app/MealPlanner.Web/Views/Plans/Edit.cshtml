@@ -1,56 +1,51 @@
 @model MealPlanner.Domain.Entities.Plan
 
 @{
-    ViewData["Title"] = "Edit plan";
+    ViewData["Title"] = "Редагувати план";
 }
 
-<h1>Edit plan</h1>
-
-<hr />
+<h1>Редагувати план харчування</h1>
+<p class="page-subtitle mb-4">Оновлення параметрів плану.</p>
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-lg-8">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="UserId" class="form-label">User</label>
-                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
-                    <option value="">Select user</option>
-                </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <label asp-for="UserId" class="form-label">Користувач</label>
+                <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId"></select>
             </div>
 
             <div class="mb-3">
-                <label asp-for="MacroId" class="form-label">Macro</label>
-                <select asp-for="MacroId" asp-items="ViewBag.MacroId" class="form-select">
-                    <option value="">No macro</option>
+                <label asp-for="MacroId" class="form-label">Макрос</label>
+                <select asp-for="MacroId" class="form-select" asp-items="ViewBag.MacroId">
+                    <option value="">Не вибрано</option>
                 </select>
-                <span asp-validation-for="MacroId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Days" class="form-label"></label>
+                <label asp-for="Days" class="form-label">Кількість днів</label>
                 <input asp-for="Days" class="form-control" />
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Status" class="form-label"></label>
+            <div class="mb-4">
+                <label asp-for="Status" class="form-label">Статус</label>
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

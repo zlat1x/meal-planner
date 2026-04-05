@@ -1,65 +1,59 @@
 @model MealPlanner.Domain.Entities.Export
 
 @{
-    ViewData["Title"] = "Edit export";
+    ViewData["Title"] = "Редагувати експорт";
 }
 
-<h1>Edit export</h1>
-
-<hr />
+<h1>Редагувати експорт</h1>
+<p class="page-subtitle mb-4">Оновлення інформації про експортований файл.</p>
 
 <div class="row">
-    <div class="col-md-7">
-        <form asp-action="Edit" method="post">
+    <div class="col-lg-8">
+        <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CreatedAt" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="UserId" class="form-label">User</label>
-                <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
-                    <option value="">Select user</option>
-                </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <label asp-for="UserId" class="form-label">Користувач</label>
+                <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId"></select>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Type" class="form-label"></label>
+                <label asp-for="PlanId" class="form-label">План</label>
+                <select asp-for="PlanId" class="form-select" asp-items="ViewBag.PlanId">
+                    <option value="">Не вибрано</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ListId" class="form-label">Список покупок</label>
+                <select asp-for="ListId" class="form-select" asp-items="ViewBag.ListId">
+                    <option value="">Не вибрано</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label">Тип</label>
                 <input asp-for="Type" class="form-control" />
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="PlanId" class="form-label">Plan</label>
-                <select asp-for="PlanId" asp-items="ViewBag.PlanId" class="form-select">
-                    <option value="">No plan</option>
-                </select>
-                <span asp-validation-for="PlanId" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="ListId" class="form-label">Shop list</label>
-                <select asp-for="ListId" asp-items="ViewBag.ListId" class="form-select">
-                    <option value="">No shop list</option>
-                </select>
-                <span asp-validation-for="ListId" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="FileUrl" class="form-label"></label>
+            <div class="mb-4">
+                <label asp-for="FileUrl" class="form-label">Шлях до файлу</label>
                 <input asp-for="FileUrl" class="form-control" />
                 <span asp-validation-for="FileUrl" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to list</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
