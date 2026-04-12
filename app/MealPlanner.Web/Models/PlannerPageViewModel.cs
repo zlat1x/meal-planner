@@ -24,6 +24,9 @@ public class PlannerPageViewModel
 
     public string ExportText { get; set; } = string.Empty;
 
+    public string ImportedExcelFileName { get; set; } = string.Empty;
+    public List<PlannerImportedExcelItemViewModel> ImportedExcelItems { get; set; } = new();
+
     public List<PlannerPickerFoodViewModel> ProteinFoods { get; set; } = new();
     public List<PlannerPickerFoodViewModel> CarbFoods { get; set; } = new();
     public List<PlannerPickerFoodViewModel> FatFoods { get; set; } = new();
@@ -102,4 +105,12 @@ public class PlannerShoppingItemViewModel
 
     public decimal TotalQuantity { get; set; }
     public decimal DisplayQuantityValue { get; set; }
+}
+
+public class PlannerImportedExcelItemViewModel
+{
+    public int RowNo { get; set; }
+    public string FoodName { get; set; } = string.Empty;
+    public decimal QuantityValue { get; set; }
+    public string UnitName { get; set; } = string.Empty;
 }

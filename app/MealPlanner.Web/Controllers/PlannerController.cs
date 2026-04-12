@@ -1,8 +1,10 @@
+using ClosedXML.Excel;
 using MealPlanner.Domain.Entities;
 using MealPlanner.Infrastructure.Data;
 using MealPlanner.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 
@@ -139,6 +141,295 @@ public class PlannerController : Controller
 
         var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
         return File(bytes, "text/plain", fileName);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ExportExcel(PlannerPageViewModel model)
+    {
+        await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
+        NormalizeMeals(model);
+
+        ValidatePlannerInput(model);
+
+        if (!ModelState.IsValid)
+        {
+            return View("Index", model);
+        }
+
+        await BuildResultAsync(model);
+
+        var exportsPath = Path.Combine(_environment.WebRootPath, "exports");
+        Directory.CreateDirectory(exportsPath);
+
+        var fileName = $"meal-plan-{DateTime.Now:yyyyMMdd-HHmmss}.xlsx";
+        var filePath = Path.Combine(exportsPath, fileName);
+
+        using (var workbook = new XLWorkbook())
+        {
+            BuildSummarySheet(workbook, model);
+            BuildMealsSheet(workbook, model);
+            BuildShoppingListSheet(workbook, model);
+            workbook.SaveAs(filePath);
+        }
+
+        if (model.UserId.HasValue)
+        {
+            var export = new Export
+            {
+                Id = Guid.NewGuid(),
+                UserId = model.UserId.Value,
+                Type = "xlsx",
+                PlanId = null,
+                ListId = null,
+                FileUrl = $"/exports/{fileName}",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Exports.Add(export);
+            await _context.SaveChangesAsync();
+        }
+
+        var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+        return File(
+            bytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileName);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ImportExcel(PlannerPageViewModel model, IFormFile? excelFile)
+    {
+        await FillOptionsAsync(model);
+        await SetCurrentUserAsync(model);
+        NormalizeMeals(model);
+
+        if (excelFile == null || excelFile.Length == 0)
+        {
+            ModelState.AddModelError(string.Empty, "Потрібно вибрати Excel-файл для імпорту.");
+            return View("Index", model);
+        }
+
+        var extension = Path.GetExtension(excelFile.FileName).ToLowerInvariant();
+        if (extension != ".xlsx")
+        {
+            ModelState.AddModelError(string.Empty, "Підтримується лише формат .xlsx.");
+            return View("Index", model);
+        }
+
+        try
+        {
+            using var stream = excelFile.OpenReadStream();
+            using var workbook = new XLWorkbook(stream);
+
+            var sheet = workbook.Worksheets.FirstOrDefault(x => x.Name == "Список покупок")
+                        ?? workbook.Worksheet(1);
+
+            model.ImportedExcelItems = ReadImportedShoppingItems(sheet);
+            model.ImportedExcelFileName = excelFile.FileName;
+
+            if (!model.ImportedExcelItems.Any())
+            {
+                ModelState.AddModelError(string.Empty, "У файлі не знайдено жодної позиції для імпорту.");
+                return View("Index", model);
+            }
+
+            ViewBag.ImportSuccess = $"Файл {excelFile.FileName} успішно імпортовано. Зчитано {model.ImportedExcelItems.Count} позицій.";
+
+            return View("Index", model);
+        }
+        catch
+        {
+            ModelState.AddModelError(string.Empty, "Не вдалося прочитати Excel-файл. Перевір формат і структуру файлу.");
+            return View("Index", model);
+        }
+    }
+
+    private void BuildSummarySheet(XLWorkbook workbook, PlannerPageViewModel model)
+    {
+        var ws = workbook.Worksheets.Add("Підсумок");
+
+        ws.Cell("A1").Value = "Meal Planner - підсумок";
+        ws.Range("A1:B1").Merge();
+        ws.Cell("A1").Style.Font.Bold = true;
+        ws.Cell("A1").Style.Font.FontSize = 16;
+
+        ws.Cell("A3").Value = "Показник";
+        ws.Cell("B3").Value = "Значення";
+
+        ws.Range("A3:B3").Style.Font.Bold = true;
+        ws.Range("A3:B3").Style.Fill.BackgroundColor = XLColor.LightBlue;
+
+        ws.Cell("A4").Value = "Ціль по білках";
+        ws.Cell("B4").Value = model.ProteinTarget;
+
+        ws.Cell("A5").Value = "Ціль по жирах";
+        ws.Cell("B5").Value = model.FatTarget;
+
+        ws.Cell("A6").Value = "Ціль по вуглеводах";
+        ws.Cell("B6").Value = model.CarbTarget;
+
+        ws.Cell("A7").Value = "Фактично білки";
+        ws.Cell("B7").Value = model.ActualProtein;
+
+        ws.Cell("A8").Value = "Фактично жири";
+        ws.Cell("B8").Value = model.ActualFat;
+
+        ws.Cell("A9").Value = "Фактично вуглеводи";
+        ws.Cell("B9").Value = model.ActualCarb;
+
+        ws.Cell("A10").Value = "Фактичні калорії";
+        ws.Cell("B10").Value = model.ActualKcal;
+
+        ws.Cell("A11").Value = "Кількість днів";
+        ws.Cell("B11").Value = model.Days;
+
+        ws.Columns().AdjustToContents();
+    }
+
+    private void BuildMealsSheet(XLWorkbook workbook, PlannerPageViewModel model)
+    {
+        var ws = workbook.Worksheets.Add("Меню");
+
+        ws.Cell("A1").Value = "Meal Planner - меню";
+        ws.Range("A1:J1").Merge();
+        ws.Cell("A1").Style.Font.Bold = true;
+        ws.Cell("A1").Style.Font.FontSize = 16;
+
+        ws.Cell("A3").Value = "Прийом №";
+        ws.Cell("B3").Value = "Назва прийому";
+        ws.Cell("C3").Value = "Роль";
+        ws.Cell("D3").Value = "Продукт";
+        ws.Cell("E3").Value = "Кількість";
+        ws.Cell("F3").Value = "Одиниця";
+        ws.Cell("G3").Value = "Білки";
+        ws.Cell("H3").Value = "Жири";
+        ws.Cell("I3").Value = "Вуглеводи";
+        ws.Cell("J3").Value = "Калорії";
+
+        ws.Range("A3:J3").Style.Font.Bold = true;
+        ws.Range("A3:J3").Style.Fill.BackgroundColor = XLColor.LightBlue;
+
+        var row = 4;
+
+        foreach (var meal in model.ResultMeals)
+        {
+            foreach (var item in meal.Items)
+            {
+                ws.Cell(row, 1).Value = meal.MealNo;
+                ws.Cell(row, 2).Value = meal.MealName;
+                ws.Cell(row, 3).Value = item.RoleName;
+                ws.Cell(row, 4).Value = item.FoodName;
+                ws.Cell(row, 5).Value = item.DisplayQuantityValue;
+                ws.Cell(row, 6).Value = item.DisplayUnitName;
+                ws.Cell(row, 7).Value = item.Protein;
+                ws.Cell(row, 8).Value = item.Fat;
+                ws.Cell(row, 9).Value = item.Carb;
+                ws.Cell(row, 10).Value = item.Kcal;
+                row++;
+            }
+
+            ws.Cell(row, 2).Value = "Разом";
+            ws.Cell(row, 7).Value = meal.ProteinTotal;
+            ws.Cell(row, 8).Value = meal.FatTotal;
+            ws.Cell(row, 9).Value = meal.CarbTotal;
+            ws.Cell(row, 10).Value = meal.KcalTotal;
+
+            ws.Range(row, 2, row, 10).Style.Font.Bold = true;
+            ws.Range(row, 2, row, 10).Style.Fill.BackgroundColor = XLColor.LightGray;
+
+            row++;
+        }
+
+        ws.Columns().AdjustToContents();
+    }
+
+    private void BuildShoppingListSheet(XLWorkbook workbook, PlannerPageViewModel model)
+    {
+        var ws = workbook.Worksheets.Add("Список покупок");
+
+        ws.Cell("A1").Value = "Meal Planner - список покупок";
+        ws.Range("A1:D1").Merge();
+        ws.Cell("A1").Style.Font.Bold = true;
+        ws.Cell("A1").Style.Font.FontSize = 16;
+
+        ws.Cell("A3").Value = "№";
+        ws.Cell("B3").Value = "Продукт";
+        ws.Cell("C3").Value = "Кількість";
+        ws.Cell("D3").Value = "Одиниця";
+
+        ws.Range("A3:D3").Style.Font.Bold = true;
+        ws.Range("A3:D3").Style.Fill.BackgroundColor = XLColor.LightBlue;
+
+        var row = 4;
+        var index = 1;
+
+        foreach (var item in model.ShoppingItems)
+        {
+            ws.Cell(row, 1).Value = index;
+            ws.Cell(row, 2).Value = item.FoodName;
+            ws.Cell(row, 3).Value = decimal.Round(item.DisplayQuantityValue, 0);
+            ws.Cell(row, 4).Value = item.DisplayUnitName;
+
+            row++;
+            index++;
+        }
+
+        ws.Columns().AdjustToContents();
+    }
+
+    private List<PlannerImportedExcelItemViewModel> ReadImportedShoppingItems(IXLWorksheet sheet)
+    {
+        var items = new List<PlannerImportedExcelItemViewModel>();
+        var lastRow = sheet.LastRowUsed()?.RowNumber() ?? 0;
+
+        for (var row = 4; row <= lastRow; row++)
+        {
+            var foodName = sheet.Cell(row, 2).GetString().Trim();
+
+            if (string.IsNullOrWhiteSpace(foodName))
+            {
+                continue;
+            }
+
+            var quantityValue = ParseExcelDecimal(sheet.Cell(row, 3));
+            var unitName = sheet.Cell(row, 4).GetString().Trim();
+
+            items.Add(new PlannerImportedExcelItemViewModel
+            {
+                RowNo = items.Count + 1,
+                FoodName = foodName,
+                QuantityValue = quantityValue,
+                UnitName = unitName
+            });
+        }
+
+        return items;
+    }
+
+    private decimal ParseExcelDecimal(IXLCell cell)
+    {
+        if (cell.TryGetValue<decimal>(out var decimalValue))
+        {
+            return decimalValue;
+        }
+
+        var raw = cell.GetString().Trim();
+
+        if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var invariantValue))
+        {
+            return invariantValue;
+        }
+
+        if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.GetCultureInfo("uk-UA"), out var ukValue))
+        {
+            return ukValue;
+        }
+
+        return 0;
     }
 
     private List<decimal> GetMacroWeights(int mealsPerDay)
@@ -453,9 +744,6 @@ public class PlannerController : Controller
             proteinSlotData.Add(ProteinSlotData.Dynamic());
         }
 
-        // =======================
-        // PROTEIN
-        // =======================
         var remainingProtein = model.ProteinTarget - fixedProtein;
         if (remainingProtein < 0)
         {
@@ -467,9 +755,6 @@ public class PlannerController : Controller
             remainingProtein,
             m => m.ProteinFoodId.HasValue);
 
-        // =======================
-        // CARB
-        // =======================
         var remainingCarb = model.CarbTarget - fixedCarbFromProtein;
         if (remainingCarb < 0)
         {
@@ -521,9 +806,6 @@ public class PlannerController : Controller
             });
         }
 
-        // =======================
-        // FAT
-        // =======================
         var remainingFat = model.FatTarget - usedFat;
         var fatOverkill = remainingFat < -5m;
 
@@ -577,7 +859,6 @@ public class PlannerController : Controller
         model.ExportText = BuildExportText(model);
         model.HasResult = true;
     }
-
 
     private void AdjustResultMacros(
         PlannerPageViewModel model,
@@ -771,7 +1052,6 @@ public class PlannerController : Controller
         model.ActualFat = decimal.Round(model.ActualFat, 1);
         model.ActualKcal = decimal.Round(model.ActualKcal, 0);
     }
-
 
     private void BuildShoppingList(PlannerPageViewModel model)
     {

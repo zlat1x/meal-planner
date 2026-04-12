@@ -25,9 +25,16 @@
         </div>
     }
 
+    @if (ViewBag.ImportSuccess != null)
+    {
+        <div class="alert alert-info mb-4">
+            @ViewBag.ImportSuccess
+        </div>
+    }
+
     <div class="card planner-main-card mb-4">
         <div class="card-body">
-            <form asp-controller="Planner" method="post">
+            <form asp-controller="Planner" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -204,11 +211,72 @@
                         <button type="submit" asp-action="ExportText" class="btn btn-outline-primary btn-lg">
                             Експорт .txt
                         </button>
+
+                        <button type="submit" asp-action="ExportExcel" class="btn btn-outline-success btn-lg">
+                            Експорт .xlsx
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <div class="section-header mb-3">
+                            <h3 class="mb-0">Імпорт Excel</h3>
+                            <span class="planner-section-note">Завантаж файл .xlsx зі списком покупок</span>
+                        </div>
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label">Excel-файл</label>
+                                <input type="file" name="excelFile" class="form-control" accept=".xlsx" />
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" asp-action="ImportExcel" class="btn btn-outline-secondary w-100">
+                                    Імпорт .xlsx
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
+    @if (Model.ImportedExcelItems.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h2 class="mb-0">Імпортований список покупок</h2>
+                    <span class="planner-section-note">@Model.ImportedExcelFileName</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Продукт</th>
+                                <th>Кількість</th>
+                                <th>Одиниця</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model.ImportedExcelItems)
+                        {
+                            <tr>
+                                <td>@item.RowNo</td>
+                                <td>@item.FoodName</td>
+                                <td>@item.QuantityValue</td>
+                                <td>@item.UnitName</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
 
     @if (Model.HasResult)
     {
