@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Text.Json
 @model MealPlanner.Web.Models.PlannerPageViewModel
 
 @{
@@ -123,7 +124,7 @@
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Білковий продукт</div>
 
-                                            <input asp-for="Meals[@i].ProteinFoodId" type="hidden" id="proteinInput_@i" /> @* оце додали *@
+                                            <input asp-for="Meals[@i].ProteinFoodId" type="hidden" id="proteinInput_@i" />
 
                                             <button type="button"
                                                     class="planner-picker-btn"
@@ -141,7 +142,7 @@
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Вуглеводний продукт</div>
 
-                                            <input asp-for="Meals[@i].CarbFoodId" type="hidden" id="carbInput_@i" /> @* оце додали *@
+                                            <input asp-for="Meals[@i].CarbFoodId" type="hidden" id="carbInput_@i" />
 
                                             <button type="button"
                                                     class="planner-picker-btn planner-picker-btn-carb"
@@ -159,7 +160,7 @@
                                         <div class="planner-food-role-box">
                                             <div class="planner-food-role-title">Жировий продукт</div>
 
-                                            <input asp-for="Meals[@i].FatFoodId" type="hidden" id="fatInput_@i" /> @* оце додали *@
+                                            <input asp-for="Meals[@i].FatFoodId" type="hidden" id="fatInput_@i" />
 
                                             <button type="button"
                                                     class="planner-picker-btn planner-picker-btn-fat"
@@ -277,6 +278,39 @@
                     </div>
                 </div>
             }
+        </div>
+
+        <div class="section-header mt-5 mb-3">
+            <h2 class="mb-0">Візуалізація результату</h2>
+            <span class="planner-section-note">Аналіз поточного розрахованого меню</span>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="mb-2">Розподіл калорій по прийомах їжі</h3>
+                        <p class="page-subtitle mb-3">
+                            Дає змогу побачити, чи не перевантажений якийсь окремий прийом їжі
+                            та наскільки рівномірно розподілені калорії протягом дня.
+                        </p>
+                        <div id="mealKcalChart" style="width: 100%; min-height: 360px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="mb-2">Розподіл БЖВ по прийомах їжі</h3>
+                        <p class="page-subtitle mb-3">
+                            Допомагає оцінити баланс білків, жирів і вуглеводів у кожному прийомі їжі
+                            та швидко знайти перекіс у меню.
+                        </p>
+                        <div id="mealMacrosChart" style="width: 100%; min-height: 360px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="section-header mt-5 mb-3">
@@ -412,4 +446,83 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        const resultMeals = @Html.Raw(JsonSerializer.Serialize(Model.ResultMeals));
+
+        google.charts.load('current', { packages: ['corechart', 'bar'] });
+        google.charts.setOnLoadCallback(drawPlannerCharts);
+        window.addEventListener('resize', drawPlannerCharts);
+
+        function drawPlannerCharts() {
+            drawMealKcalChart();
+            drawMealMacrosChart();
+        }
+
+        function drawMealKcalChart() {
+            const container = document.getElementById('mealKcalChart');
+            if (!container) return;
+
+            if (!resultMeals || !resultMeals.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Прийом їжі');
+            data.addColumn('number', 'Калорії');
+
+            resultMeals.forEach(meal => {
+                data.addRow([meal.MealName, Number(meal.KcalTotal)]);
+            });
+
+            const options = {
+                legend: { position: 'none' },
+                chartArea: { width: '75%', height: '70%' },
+                hAxis: { title: 'Прийом їжі' },
+                vAxis: { title: 'Ккал', minValue: 0 }
+            };
+
+            const chart = new google.visualization.ColumnChart(container);
+            chart.draw(data, options);
+        }
+
+        function drawMealMacrosChart() {
+            const container = document.getElementById('mealMacrosChart');
+            if (!container) return;
+
+            if (!resultMeals || !resultMeals.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Прийом їжі');
+            data.addColumn('number', 'Білки');
+            data.addColumn('number', 'Жири');
+            data.addColumn('number', 'Вуглеводи');
+
+            resultMeals.forEach(meal => {
+                data.addRow([
+                    meal.MealName,
+                    Number(meal.ProteinTotal),
+                    Number(meal.FatTotal),
+                    Number(meal.CarbTotal)
+                ]);
+            });
+
+            const options = {
+                chartArea: { width: '70%', height: '70%' },
+                hAxis: { title: 'Прийом їжі' },
+                vAxis: { title: 'Грами', minValue: 0 },
+                legend: { position: 'top' },
+                isStacked: false
+            };
+
+            const chart = new google.visualization.ColumnChart(container);
+            chart.draw(data, options);
+        }
+    </script>
 }

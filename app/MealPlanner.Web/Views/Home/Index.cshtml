@@ -1,4 +1,7 @@
-﻿@{
+﻿@using System.Text.Json
+@model MealPlanner.Web.Models.HomeDashboardViewModel
+
+@{
     ViewData["Title"] = "Головна";
 }
 
@@ -9,7 +12,7 @@
             <h1 class="display-5 mb-3">Планування харчування в одному місці</h1>
             <p class="dashboard-lead">
                 Meal Planner допомагає скласти раціон, розрахувати меню під ціль БЖВ,
-                сформувати список покупок та працювати з базою продуктів.
+                сформувати список покупок і зберегти результат для подальшої роботи.
             </p>
 
             <div class="hero-actions">
@@ -30,9 +33,397 @@
                     <li>Розрахунок БЖВ і калорій</li>
                     <li>Формування списку покупок</li>
                     <li>Збереження плану в базу даних</li>
-                    <li>Робота з продуктами та одиницями</li>
+                    <li>Історія експортів та аналітика</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
+
+<div class="summary-grid mb-4">
+    <div class="summary-card">
+        <div class="summary-card-title">Користувачів</div>
+        <div class="summary-card-value">@Model.UsersCount</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-card-title">Продуктів</div>
+        <div class="summary-card-value">@Model.FoodsCount</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-card-title">Планів</div>
+        <div class="summary-card-value">@Model.PlansCount</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-card-title">Списків покупок</div>
+        <div class="summary-card-value">@Model.ShopListsCount</div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-card-title">Експортів</div>
+        <div class="summary-card-value">@Model.ExportsCount</div>
+    </div>
+</div>
+
+<div class="page-hero mb-4">
+    <div class="page-title-wrap">
+        <h2>Корисна аналітика</h2>
+        <p class="page-subtitle">
+            Ці діаграми показують не просто технічні дані, а реальну картину використання застосунку:
+            наповнення каталогу, середню калорійність категорій, типову тривалість планування
+            і стан збережених меню.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3 class="mb-2">Категорії продуктів у каталозі</h3>
+                <p class="page-subtitle mb-3">
+                    Допомагає побачити, яких продуктів у системі найбільше: білкових, жирів чи вуглеводів.
+                </p>
+                <div id="foodsByCategoryChart" style="width: 100%; min-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3 class="mb-2">Середня калорійність по категоріях</h3>
+                <p class="page-subtitle mb-3">
+                    Показує, яка категорія продуктів у середньому більш калорійна на 100 одиниць.
+                </p>
+                <div id="averageKcalChart" style="width: 100%; min-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3 class="mb-2">На скільки днів планують покупки</h3>
+                <p class="page-subtitle mb-3">
+                    Дозволяє побачити найтиповішу тривалість списку покупок: 1, 3, 5 або 7 днів.
+                </p>
+                <div id="shopListsByDaysChart" style="width: 100%; min-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3 class="mb-2">Статуси збережених планів</h3>
+                <p class="page-subtitle mb-3">
+                    Показує, в якому стані зараз знаходяться плани користувачів.
+                </p>
+                <div id="plansByStatusChart" style="width: 100%; min-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Останні оновлені продукти</h3>
+                    <a asp-controller="Foods" asp-action="Index" class="btn btn-sm btn-outline-primary">Усі продукти</a>
+                </div>
+
+                @if (Model.LatestFoods.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Продукт</th>
+                                    <th>Категорія</th>
+                                    <th>Ккал/100</th>
+                                    <th>Оновлено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestFoods)
+                            {
+                                <tr>
+                                    <td>@(item.Icon?.Emoji ?? "🍽️") @item.Name</td>
+                                    <td>@item.Category</td>
+                                    <td>@item.KcalPer100</td>
+                                    <td>@item.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Продуктів поки що немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Останні збережені плани</h3>
+                    <a asp-controller="Plans" asp-action="Index" class="btn btn-sm btn-outline-primary">Усі плани</a>
+                </div>
+
+                @if (Model.LatestPlans.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Статус</th>
+                                    <th>Днів</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestPlans)
+                            {
+                                <tr>
+                                    <td>@(item.User?.Name ?? "—")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.Status) ? "Без статусу" : item.Status)</td>
+                                    <td>@item.Days</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Планів поки що немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Останні списки покупок</h3>
+                    <a asp-controller="ShopLists" asp-action="Index" class="btn btn-sm btn-outline-primary">Усі списки</a>
+                </div>
+
+                @if (Model.LatestShopLists.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Днів</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestShopLists)
+                            {
+                                <tr>
+                                    <td>@(item.Plan?.User?.Name ?? "—")</td>
+                                    <td>@item.Days</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Списків покупок поки що немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-header mb-3">
+                    <h3 class="mb-0">Останні експорти</h3>
+                    <a asp-controller="Exports" asp-action="Index" class="btn btn-sm btn-outline-primary">Усі експорти</a>
+                </div>
+
+                @if (Model.LatestExports.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Тип</th>
+                                    <th>Файл</th>
+                                    <th>Створено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.LatestExports)
+                            {
+                                <tr>
+                                    <td>@(item.User?.Name ?? "—")</td>
+                                    <td>@item.Type</td>
+                                    <td class="text-break">@item.FileUrl</td>
+                                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">Експортів поки що немає.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        const foodsByCategory = @Html.Raw(JsonSerializer.Serialize(Model.FoodsByCategory));
+        const averageKcalByCategory = @Html.Raw(JsonSerializer.Serialize(Model.AverageKcalByCategory));
+        const shopListsByDays = @Html.Raw(JsonSerializer.Serialize(Model.ShopListsByDays));
+        const plansByStatus = @Html.Raw(JsonSerializer.Serialize(Model.PlansByStatus));
+
+        google.charts.load('current', { packages: ['corechart', 'bar'] });
+        google.charts.setOnLoadCallback(drawAllCharts);
+        window.addEventListener('resize', drawAllCharts);
+
+        function drawAllCharts() {
+            drawFoodsByCategoryChart();
+            drawAverageKcalChart();
+            drawShopListsByDaysChart();
+            drawPlansByStatusChart();
+        }
+
+        function drawFoodsByCategoryChart() {
+            const container = document.getElementById('foodsByCategoryChart');
+            if (!container) return;
+
+            if (!foodsByCategory.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Категорія');
+            data.addColumn('number', 'Кількість продуктів');
+
+            foodsByCategory.forEach(item => {
+                data.addRow([item.categoryName, item.count]);
+            });
+
+            const options = {
+                legend: { position: 'none' },
+                chartArea: { width: '75%', height: '70%' },
+                hAxis: { title: 'Категорія' },
+                vAxis: { title: 'Кількість продуктів', minValue: 0 }
+            };
+
+            const chart = new google.visualization.ColumnChart(container);
+            chart.draw(data, options);
+        }
+
+        function drawAverageKcalChart() {
+            const container = document.getElementById('averageKcalChart');
+            if (!container) return;
+
+            if (!averageKcalByCategory.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Категорія');
+            data.addColumn('number', 'Середні ккал');
+
+            averageKcalByCategory.forEach(item => {
+                data.addRow([item.categoryName, Number(item.averageKcal)]);
+            });
+
+            const options = {
+                legend: { position: 'none' },
+                chartArea: { width: '75%', height: '70%' },
+                hAxis: { title: 'Категорія' },
+                vAxis: { title: 'Ккал на 100 одиниць', minValue: 0 }
+            };
+
+            const chart = new google.visualization.BarChart(container);
+            chart.draw(data, options);
+        }
+
+        function drawShopListsByDaysChart() {
+            const container = document.getElementById('shopListsByDaysChart');
+            if (!container) return;
+
+            if (!shopListsByDays.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Період');
+            data.addColumn('number', 'Кількість списків');
+
+            shopListsByDays.forEach(item => {
+                data.addRow([`${item.days} дн.`, item.count]);
+            });
+
+            const options = {
+                legend: { position: 'none' },
+                pieHole: 0.35,
+                chartArea: { width: '90%', height: '80%' }
+            };
+
+            const chart = new google.visualization.PieChart(container);
+            chart.draw(data, options);
+        }
+
+        function drawPlansByStatusChart() {
+            const container = document.getElementById('plansByStatusChart');
+            if (!container) return;
+
+            if (!plansByStatus.length) {
+                container.innerHTML = '<p class="empty-state">Недостатньо даних для побудови діаграми.</p>';
+                return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Статус');
+            data.addColumn('number', 'Кількість планів');
+
+            plansByStatus.forEach(item => {
+                data.addRow([item.status, item.count]);
+            });
+
+            const options = {
+                legend: { position: 'right' },
+                chartArea: { width: '75%', height: '70%' },
+                pieHole: 0.2
+            };
+
+            const chart = new google.visualization.PieChart(container);
+            chart.draw(data, options);
+        }
+    </script>
+}

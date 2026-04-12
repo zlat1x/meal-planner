@@ -27,6 +27,50 @@ public class HomeController : Controller
             ShopListsCount = await _context.ShopLists.AsNoTracking().CountAsync(),
             ExportsCount = await _context.Exports.AsNoTracking().CountAsync(),
 
+            FoodsByCategory = await _context.Foods
+                .AsNoTracking()
+                .GroupBy(x => x.Category)
+                .Select(g => new DashboardCategoryCountItemViewModel
+                {
+                    CategoryName = g.Key.ToString(),
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .ToListAsync(),
+
+            AverageKcalByCategory = await _context.Foods
+                .AsNoTracking()
+                .GroupBy(x => x.Category)
+                .Select(g => new DashboardCategoryKcalItemViewModel
+                {
+                    CategoryName = g.Key.ToString(),
+                    AverageKcal = g.Average(x => x.KcalPer100)
+                })
+                .OrderByDescending(x => x.AverageKcal)
+                .ToListAsync(),
+
+            ShopListsByDays = await _context.ShopLists
+                .AsNoTracking()
+                .GroupBy(x => x.Days)
+                .Select(g => new DashboardDaysDistributionItemViewModel
+                {
+                    Days = g.Key,
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Days)
+                .ToListAsync(),
+
+            PlansByStatus = await _context.Plans
+                .AsNoTracking()
+                .GroupBy(x => string.IsNullOrWhiteSpace(x.Status) ? "Без статусу" : x.Status)
+                .Select(g => new DashboardPlanStatusItemViewModel
+                {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .ToListAsync(),
+
             LatestFoods = await _context.Foods
                 .AsNoTracking()
                 .Include(x => x.Icon)
