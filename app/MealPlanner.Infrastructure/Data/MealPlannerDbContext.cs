@@ -21,6 +21,7 @@ public class MealPlannerDbContext : DbContext
     public DbSet<MealItem> MealItems => Set<MealItem>();
     public DbSet<ShopItem> ShopItems => Set<ShopItem>();
     public DbSet<Export> Exports => Set<Export>();
+    public DbSet<AuthAccount> AuthAccounts => Set<AuthAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -371,6 +372,26 @@ public class MealPlannerDbContext : DbContext
                 .WithMany(x => x.Exports)
                 .HasForeignKey(x => x.ListId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // auth_account
+        modelBuilder.Entity<AuthAccount>(e =>
+        {
+            e.ToTable("auth_account");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.UserId).HasColumnName("user_id");
+            e.Property(x => x.PasswordHash).HasColumnName("password_hash").HasMaxLength(512).IsRequired();
+            e.Property(x => x.Role).HasColumnName("role").HasMaxLength(32).IsRequired();
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+
+            e.HasIndex(x => x.UserId).IsUnique();
+
+            e.HasOne(x => x.User)
+                .WithOne()
+                .HasForeignKey<AuthAccount>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
