@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Meal Planner API Client</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <p class="label">Лабораторний проєкт №2</p>
+            <h1>Meal Planner Web API</h1>
+            <p>
+                Сторінка демонструє виклик Web API через JavaScript:
+                завантаження продуктів, пошук, фільтрацію та розрахунок меню.
+            </p>
+        </section>
+
+        <section class="panel">
+            <div class="toolbar">
+                <input id="searchInput" type="text" placeholder="Пошук продукту">
+                <select id="categoryInput">
+                    <option value="">Усі категорії</option>
+                    <option value="Protein">Білкові</option>
+                    <option value="Carb">Вуглеводні</option>
+                    <option value="Fat">Жирові</option>
+                </select>
+                <button onclick="loadFoods()">Завантажити</button>
+                <button class="secondary" onclick="clearOutput()">Clear</button>
+            </div>
+
+            <p id="counter"></p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Категорія</th>
+                        <th>Білки</th>
+                        <th>Вуглеводи</th>
+                        <th>Жири</th>
+                        <th>Ккал</th>
+                    </tr>
+                </thead>
+                <tbody id="foodsBody"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <h2>Швидка перевірка розрахунку меню</h2>
+            <p class="hint">
+                Для демонстрації автоматично береться перший продукт кожної категорії.
+            </p>
+            <div class="toolbar">
+                <input id="proteinTarget" type="number" value="90" placeholder="Білки">
+                <input id="carbTarget" type="number" value="160" placeholder="Вуглеводи">
+                <input id="fatTarget" type="number" value="55" placeholder="Жири">
+                <select id="mealsPerDay">
+                    <option value="2">2 прийоми</option>
+                    <option value="3" selected>3 прийоми</option>
+                    <option value="4">4 прийоми</option>
+                </select>
+                <button onclick="calculateDemoPlan()">Розрахувати</button>
+            </div>
+            <div id="planResult"></div>
+        </section>
+    </main>
+
+    <script src="js/meal-planner-api.js"></script>
+</body>
+</html>
