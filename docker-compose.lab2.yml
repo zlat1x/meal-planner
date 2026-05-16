@@ -1,0 +1,25 @@
+services:
+  meal-planner-api:
+    build:
+      context: ./app
+      dockerfile: MealPlanner.Api/Dockerfile
+    ports:
+      - "5088:8080"
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=meal_planner;Username=postgres;Password=postgres"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: meal_planner
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - meal_planner_lab2_data:/var/lib/postgresql/data
+
+volumes:
+  meal_planner_lab2_data:
