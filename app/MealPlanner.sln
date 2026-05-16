@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Web", "MealPlan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Api", "MealPlanner.Api\MealPlanner.Api.csproj", "{45C0A9D9-E6E0-480E-82AE-C3299A6355BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Api.Tests", "..\tests\MealPlanner.Api.Tests\MealPlanner.Api.Tests.csproj", "{631D3A42-8516-4520-9F8F-A77A81B966E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{45C0A9D9-E6E0-480E-82AE-C3299A6355BB}.Release|x64.Build.0 = Release|Any CPU
 		{45C0A9D9-E6E0-480E-82AE-C3299A6355BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{45C0A9D9-E6E0-480E-82AE-C3299A6355BB}.Release|x86.Build.0 = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|x64.Build.0 = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{631D3A42-8516-4520-9F8F-A77A81B966E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
