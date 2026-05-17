@@ -64,14 +64,14 @@ async function sendAuthRequest(url, request) {
     }
 
     saveCurrentApiUser(data);
-    showAuthMessage(`${data.message} Ви увійшли як ${data.userName} (${data.role}).`, false);
+    showAuthMessage(`Вітаємо, ${data.userName}!`, false);
 }
 
 function logoutApiUser() {
     localStorage.removeItem(authStorageKey);
     updateAuthView();
     fillCurrentUserId();
-    showAuthMessage("Ви вийшли з API-клієнта.", false);
+    showAuthMessage("Ви вийшли із системи.", false);
 }
 
 function updateAuthView() {
@@ -99,12 +99,11 @@ function renderAuthStatus() {
 
     statusElements.forEach(status => {
         if (!user) {
-            status.innerHTML = "<span class='auth-badge'>Гість</span> Авторизуйтеся, щоб перейти до роботи з API-клієнтом.";
+            status.innerHTML = "Увійдіть або зареєструйтеся, щоб продовжити.";
             return;
         }
 
         status.innerHTML = `
-            <span class='auth-badge'>${user.role}</span>
             Авторизовано: <b>${user.userName}</b> (${user.email})
             <button type="button" class="secondary auth-logout-btn" onclick="logoutApiUser()">Вийти</button>
         `;
