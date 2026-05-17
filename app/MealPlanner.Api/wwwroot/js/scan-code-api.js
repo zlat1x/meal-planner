@@ -3,6 +3,7 @@ const scanCodesApi = "/api/food-scan-codes";
 
 let cameraStream = null;
 let scanTimer = null;
+let zxingReader = null;
 
 async function loadFoodsForSelect() {
     const response = await fetch(foodsApi);
@@ -108,36 +109,119 @@ async function scanCode(codeValue, source) {
 }
 
 async function startCameraScanner() {
-    if (!("BarcodeDetector" in window)) {
-        showScanError("BarcodeDetector не підтримується цим браузером. Використайте Chrome або ручне введення коду.");
+    const video = document.getElementById("cameraPreview");
+
+    if ("BarcodeDetector" in window) {
+        await startNativeCameraScanner(video);
         return;
     }
 
+    if (window.ZXing) {
+        await startZxingCameraScanner(video);
+        return;
+    }
+
+    showScanError("Браузер не підтримує вбудований BarcodeDetector, а fallback-бібліотека ZXing не завантажилась. Спробуйте Chrome або кнопку «Сфотографувати код».");
+}
+
+async function startNativeCameraScanner(video) {
     const detector = new BarcodeDetector({
         formats: ["qr_code", "ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e"]
     });
 
-    const video = document.getElementById("cameraPreview");
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment"
+            }
+        });
 
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-            facingMode: "environment"
+        video.srcObject = cameraStream;
+        video.style.display = "block";
+
+        scanTimer = setInterval(async () => {
+            if (video.readyState < 2) {
+                return;
+            }
+
+            const codes = await detector.detect(video);
+
+            if (codes.length > 0) {
+                const value = codes[0].rawValue;
+                document.getElementById("scanInput").value = value;
+                await scanCode(value, "Camera BarcodeDetector");
+                stopCameraScanner();
+            }
+        }, 1000);
+    } catch {
+        showScanError("Не вдалося увімкнути камеру. Дозвольте доступ до камери або відкрийте сторінку через HTTPS/localhost.");
+    }
+}
+
+async function startZxingCameraScanner(video) {
+    try {
+        zxingReader = new ZXing.BrowserMultiFormatReader();
+        video.style.display = "block";
+
+        const devices = await zxingReader.listVideoInputDevices();
+        const backCamera = devices.find(device =>
+            device.label.toLowerCase().includes("back") ||
+            device.label.toLowerCase().includes("rear") ||
+            device.label.toLowerCase().includes("environment")
+        );
+
+        const deviceId = backCamera?.deviceId ?? devices[0]?.deviceId;
+
+        if (!deviceId) {
+            showScanError("Камеру не знайдено. Перевірте дозвіл браузера на використання камери.");
+            return;
         }
-    });
 
-    video.srcObject = cameraStream;
-    video.style.display = "block";
+        await zxingReader.decodeFromVideoDevice(deviceId, video, async (result) => {
+            if (!result) {
+                return;
+            }
 
-    scanTimer = setInterval(async () => {
-        const codes = await detector.detect(video);
-
-        if (codes.length > 0) {
-            const value = codes[0].rawValue;
+            const value = result.getText();
             document.getElementById("scanInput").value = value;
-            await scanCode(value, "Camera");
+            await scanCode(value, "Camera ZXing");
             stopCameraScanner();
-        }
-    }, 1000);
+        });
+    } catch {
+        showScanError("Не вдалося запустити ZXing-сканер. Спробуйте кнопку «Сфотографувати код» або ручне введення.");
+    }
+}
+
+function openPhotoScanner() {
+    document.getElementById("photoInput").click();
+}
+
+async function scanPhotoCode(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    if (!window.ZXing) {
+        showScanError("Для розпізнавання фото потрібна бібліотека ZXing. Перевірте інтернет або введіть код вручну.");
+        return;
+    }
+
+    try {
+        const imageUrl = URL.createObjectURL(file);
+        const reader = new ZXing.BrowserMultiFormatReader();
+        const result = await reader.decodeFromImageUrl(imageUrl);
+        const value = result.getText();
+
+        URL.revokeObjectURL(imageUrl);
+        document.getElementById("scanInput").value = value;
+        await scanCode(value, "Photo ZXing");
+    } catch {
+        showScanError("Не вдалося розпізнати код із фото. Сфотографуйте код ближче, рівніше і при хорошому освітленні.");
+    } finally {
+        event.target.value = "";
+    }
 }
 
 function stopCameraScanner() {
@@ -149,6 +233,11 @@ function stopCameraScanner() {
     if (cameraStream !== null) {
         cameraStream.getTracks().forEach(track => track.stop());
         cameraStream = null;
+    }
+
+    if (zxingReader !== null) {
+        zxingReader.reset();
+        zxingReader = null;
     }
 
     document.getElementById("cameraPreview").style.display = "none";
