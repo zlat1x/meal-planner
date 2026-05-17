@@ -6,36 +6,38 @@ async function loadFoodsForSelect() {
     const foods = await response.json();
 
     const select = document.getElementById("foodSelect");
+
+    if (!select) {
+        return;
+    }
+
     select.innerHTML = "";
 
     foods.forEach(food => {
         const option = document.createElement("option");
         option.value = food.id;
         option.textContent = `${food.name} (${food.category})`;
-        option.dataset.userId = food.userId;
         select.appendChild(option);
-    });
-
-    if (foods.length > 0) {
-        document.getElementById("userIdInput").value = foods[0].userId;
-    }
-
-    select.addEventListener("change", () => {
-        const selectedOption = select.options[select.selectedIndex];
-        document.getElementById("userIdInput").value = selectedOption.dataset.userId;
     });
 }
 
 async function createScanCode() {
+    const currentUserId = getCurrentApiUserId();
+
+    if (!currentUserId) {
+        showBindError("Спочатку увійдіть у систему.");
+        return;
+    }
+
     const request = {
         foodId: document.getElementById("foodSelect").value,
-        userId: document.getElementById("userIdInput").value,
+        userId: currentUserId,
         codeValue: document.getElementById("codeValueInput").value.trim(),
         codeType: document.getElementById("codeTypeInput").value,
         note: "Created from API client"
     };
 
-    if (!request.foodId || !request.userId || request.codeValue.length === 0) {
+    if (!request.foodId || request.codeValue.length === 0) {
         showBindError("Оберіть продукт і введіть код.");
         return;
     }
@@ -74,6 +76,13 @@ async function scanManualCode() {
 }
 
 async function scanCode(codeValue, source) {
+    const currentUserId = getCurrentApiUserId();
+
+    if (!currentUserId) {
+        showScanError("Спочатку увійдіть у систему.");
+        return;
+    }
+
     const normalizedCode = codeValue.trim();
 
     const response = await fetch(`${scanCodesApi}/scan`, {
@@ -84,6 +93,7 @@ async function scanCode(codeValue, source) {
         },
         body: JSON.stringify({
             codeValue: normalizedCode,
+            userId: currentUserId,
             source: source
         })
     });
@@ -242,7 +252,13 @@ async function createEnlargedImageUrl(imageUrl) {
 }
 
 async function loadScanLogs() {
-    const response = await fetch(`${scanCodesApi}/logs`);
+    const currentUserId = getCurrentApiUserId();
+
+    if (!currentUserId) {
+        return;
+    }
+
+    const response = await fetch(`${scanCodesApi}/logs?userId=${currentUserId}`);
     const logs = await response.json();
 
     const body = document.getElementById("logsBody");
