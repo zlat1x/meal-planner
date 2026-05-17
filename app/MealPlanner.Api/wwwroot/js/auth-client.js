@@ -13,7 +13,7 @@ function getCurrentApiUser() {
 
 function saveCurrentApiUser(user) {
     localStorage.setItem(authStorageKey, JSON.stringify(user));
-    renderAuthStatus();
+    updateAuthView();
     fillCurrentUserId();
 }
 
@@ -69,9 +69,28 @@ async function sendAuthRequest(url, request) {
 
 function logoutApiUser() {
     localStorage.removeItem(authStorageKey);
-    renderAuthStatus();
+    updateAuthView();
     fillCurrentUserId();
     showAuthMessage("Ви вийшли з API-клієнта.", false);
+}
+
+function updateAuthView() {
+    renderAuthStatus();
+    toggleAuthorizedContent();
+}
+
+function toggleAuthorizedContent() {
+    const authGate = document.getElementById("authGate");
+    const appContent = document.getElementById("appContent");
+    const user = getCurrentApiUser();
+
+    if (authGate) {
+        authGate.hidden = user !== null;
+    }
+
+    if (appContent) {
+        appContent.hidden = user === null;
+    }
 }
 
 function renderAuthStatus() {
@@ -84,13 +103,14 @@ function renderAuthStatus() {
     const user = getCurrentApiUser();
 
     if (!user) {
-        status.innerHTML = "<span class='auth-badge'>Гість</span> Увійдіть або зареєструйтеся для демонстрації авторизації через API.";
+        status.innerHTML = "<span class='auth-badge'>Гість</span> Авторизуйтеся, щоб перейти до роботи з API-клієнтом.";
         return;
     }
 
     status.innerHTML = `
         <span class='auth-badge'>${user.role}</span>
         Авторизовано: <b>${user.userName}</b> (${user.email})
+        <button type="button" class="secondary auth-logout-btn" onclick="logoutApiUser()">Вийти</button>
     `;
 }
 
@@ -122,4 +142,4 @@ function getCurrentApiUserId() {
     return getCurrentApiUser()?.userId ?? null;
 }
 
-renderAuthStatus();
+updateAuthView();
