@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+
+actor "Користувач" as User
+actor "API-клієнт" as Client
+
+rectangle "Meal Planner API" {
+    usecase "Переглянути продукти" as ViewFoods
+    usecase "Фільтрувати продукти" as FilterFoods
+    usecase "Розрахувати меню" as CalculatePlan
+    usecase "Увійти через API" as ApiLogin
+    usecase "Прив'язати QR/штрихкод до продукту" as BindCode
+    usecase "Сканувати QR/штрихкод продукту" as ScanCode
+    usecase "Переглянути історію сканувань" as ViewLogs
+}
+
+User --> ViewFoods
+User --> FilterFoods
+User --> CalculatePlan
+User --> ApiLogin
+User --> BindCode
+User --> ScanCode
+User --> ViewLogs
+
+Client --> ApiLogin
+Client --> ScanCode
+
+ScanCode .> ViewFoods : <<include>>
+ScanCode .> ViewLogs : <<include>>
+
+@enduml
