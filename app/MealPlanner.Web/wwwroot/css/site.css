@@ -910,6 +910,69 @@ a:hover {
     line-height: 1.5;
 }
 
+.scan-hero {
+    background: linear-gradient(135deg, #f8fbff, #edf4ff);
+    border: 1px solid #dbe7fb;
+    border-radius: 22px;
+    padding: 1.75rem;
+}
+
+.scan-camera {
+    display: none;
+    width: 100%;
+    max-width: 560px;
+    border-radius: 18px;
+    border: 1px solid #dbe7fb;
+    background: #0f172a;
+}
+
+.scan-message {
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    font-weight: 700;
+}
+
+.scan-message-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.scan-message-error {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.scan-product-card {
+    background: #f8fbff;
+    border: 1px solid #dbe7fb;
+    border-radius: 18px;
+    padding: 1.2rem;
+}
+
+.scan-product-card h3 {
+    margin-bottom: 0.4rem;
+}
+
+.scan-product-card p {
+    color: #64748b;
+    margin-bottom: 0.8rem;
+}
+
+.scan-macros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.scan-macros span {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.7rem;
+    font-weight: 700;
+    color: #334155;
+}
+
 @media (max-width: 768px) {
     .planner-modal-content .modal-header,
     .planner-modal-content .modal-body {
@@ -920,16 +983,13 @@ a:hover {
     .planner-picker-btn {
         min-height: 54px;
     }
-}
 
-.planner-export-card {
-    border-radius: 18px;
-}
+    .scan-hero {
+        border-radius: 16px;
+        padding: 1.2rem;
+    }
 
-.planner-export-textarea {
-    min-height: 260px;
-    resize: vertical;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 0.96rem;
-    line-height: 1.5;
+    .scan-macros {
+        grid-template-columns: 1fr;
+    }
 }
