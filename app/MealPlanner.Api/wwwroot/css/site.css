@@ -47,6 +47,38 @@ h1 {
     margin-bottom: 18px;
 }
 
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.hero-link {
+    display: inline-block;
+    border-radius: 14px;
+    background: #fff8ef;
+    color: #2f2a25;
+    padding: 12px 16px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hero-link:hover {
+    text-decoration: none;
+    background: #f1e7d9;
+}
+
+.secondary-link {
+    background: #7b5e42;
+    color: #ffffff;
+}
+
+.secondary-link:hover {
+    background: #6b5037;
+    color: #ffffff;
+}
+
 input,
 select,
 button {
