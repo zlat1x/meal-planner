@@ -15,9 +15,9 @@
             </div>
         </section>
 
-        <section class="panel">
-            <h2>1. Авторизація користувача</h2>
-            <div id="authStatus" class="summary"></div>
+        <section id="authGate" class="panel auth-card">
+            <h2 class="auth-title">Вхід у систему</h2>
+            <div class="auth-status summary"></div>
 
             <div class="toolbar">
                 <input id="authName" type="text" placeholder="Ім'я для реєстрації">
@@ -25,58 +25,64 @@
                 <input id="authPassword" type="password" placeholder="Пароль">
                 <button type="button" onclick="registerApiUser()">Зареєструватися</button>
                 <button type="button" onclick="loginApiUser()">Увійти</button>
-                <button type="button" class="secondary" onclick="logoutApiUser()">Вийти</button>
             </div>
 
             <p id="authMessage"></p>
         </section>
 
-        <section class="panel">
-            <h2>2. Прив'язати код до продукту</h2>
+        <div id="appContent" hidden>
+            <section class="panel">
+                <h2>Користувач</h2>
+                <div class="auth-status summary"></div>
+            </section>
 
-            <div class="toolbar">
-                <select id="foodSelect"></select>
-                <input id="userIdInput" placeholder="UserId">
-                <input id="codeValueInput" placeholder="QR/штрихкод">
-                <select id="codeTypeInput">
-                    <option value="Barcode">Barcode</option>
-                    <option value="QR">QR</option>
-                </select>
-                <button onclick="createScanCode()">Прив'язати</button>
-            </div>
+            <section class="panel">
+                <h2>Прив'язати код до продукту</h2>
 
-            <p id="bindResult"></p>
-        </section>
+                <div class="toolbar">
+                    <select id="foodSelect"></select>
+                    <input id="userIdInput" placeholder="UserId" readonly>
+                    <input id="codeValueInput" placeholder="QR/штрихкод">
+                    <select id="codeTypeInput">
+                        <option value="Barcode">Barcode</option>
+                        <option value="QR">QR</option>
+                    </select>
+                    <button onclick="createScanCode()">Прив'язати</button>
+                </div>
 
-        <section class="panel">
-            <h2>3. Сканувати код</h2>
+                <p id="bindResult"></p>
+            </section>
 
-            <div class="toolbar">
-                <input id="scanInput" placeholder="Код вручну або з файлу">
-                <button onclick="scanManualCode()">Знайти продукт</button>
-                <button onclick="openFileScanner()">Завантажити QR/штрихкод з файлу</button>
-            </div>
+            <section class="panel">
+                <h2>Сканувати код</h2>
 
-            <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="scanPhotoCode(event)">
-            <div id="scanResult"></div>
-        </section>
+                <div class="toolbar">
+                    <input id="scanInput" placeholder="Код вручну або з файлу">
+                    <button onclick="scanManualCode()">Знайти продукт</button>
+                    <button onclick="openFileScanner()">Завантажити QR/штрихкод з файлу</button>
+                </div>
 
-        <section class="panel">
-            <h2>4. Історія сканувань</h2>
-            <button onclick="loadScanLogs()">Оновити історію</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Код</th>
-                        <th>Результат</th>
-                        <th>Продукт</th>
-                        <th>Джерело</th>
-                        <th>Час</th>
-                    </tr>
-                </thead>
-                <tbody id="logsBody"></tbody>
-            </table>
-        </section>
+                <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="scanPhotoCode(event)">
+                <div id="scanResult"></div>
+            </section>
+
+            <section class="panel">
+                <h2>Історія сканувань</h2>
+                <button onclick="loadScanLogs()">Оновити історію</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Результат</th>
+                            <th>Продукт</th>
+                            <th>Джерело</th>
+                            <th>Час</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody"></tbody>
+                </table>
+            </section>
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
