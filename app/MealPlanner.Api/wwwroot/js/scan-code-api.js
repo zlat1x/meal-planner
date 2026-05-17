@@ -203,25 +203,114 @@ async function scanPhotoCode(event) {
         return;
     }
 
-    if (!window.ZXing) {
-        showScanError("Для розпізнавання фото потрібна бібліотека ZXing. Перевірте інтернет або введіть код вручну.");
-        return;
+    const imageUrl = URL.createObjectURL(file);
+
+    try {
+        showScanInfo("Обробляю фото. Якщо код маленький або розмитий, зробіть фото ближче.");
+
+        const value = await readCodeFromPhoto(imageUrl);
+
+        document.getElementById("scanInput").value = value;
+        await scanCode(value, "Photo scan");
+    } catch {
+        showScanError("Не вдалося розпізнати код із фото. Зробіть фото без нахилу, ближче до коду, щоб код займав більшу частину кадру. Для перевірки QR працює надійніше за тонкий штрихкод.");
+    } finally {
+        URL.revokeObjectURL(imageUrl);
+        event.target.value = "";
+    }
+}
+
+async function readCodeFromPhoto(imageUrl) {
+    const nativeValue = await tryReadPhotoWithBarcodeDetector(imageUrl);
+
+    if (nativeValue) {
+        return nativeValue;
+    }
+
+    const zxingValue = await tryReadPhotoWithZxing(imageUrl);
+
+    if (zxingValue) {
+        return zxingValue;
+    }
+
+    const enlargedImageUrl = await createEnlargedImageUrl(imageUrl);
+
+    try {
+        const enlargedValue = await tryReadPhotoWithZxing(enlargedImageUrl);
+
+        if (enlargedValue) {
+            return enlargedValue;
+        }
+    } finally {
+        URL.revokeObjectURL(enlargedImageUrl);
+    }
+
+    throw new Error("Code was not recognized.");
+}
+
+async function tryReadPhotoWithBarcodeDetector(imageUrl) {
+    if (!("BarcodeDetector" in window)) {
+        return null;
     }
 
     try {
-        const imageUrl = URL.createObjectURL(file);
+        const detector = new BarcodeDetector({
+            formats: ["qr_code", "ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e"]
+        });
+
+        const image = await loadImage(imageUrl);
+        const codes = await detector.detect(image);
+
+        if (codes.length === 0) {
+            return null;
+        }
+
+        return codes[0].rawValue;
+    } catch {
+        return null;
+    }
+}
+
+async function tryReadPhotoWithZxing(imageUrl) {
+    if (!window.ZXing) {
+        return null;
+    }
+
+    try {
         const reader = new ZXing.BrowserMultiFormatReader();
         const result = await reader.decodeFromImageUrl(imageUrl);
-        const value = result.getText();
 
-        URL.revokeObjectURL(imageUrl);
-        document.getElementById("scanInput").value = value;
-        await scanCode(value, "Photo ZXing");
+        return result.getText();
     } catch {
-        showScanError("Не вдалося розпізнати код із фото. Сфотографуйте код ближче, рівніше і при хорошому освітленні.");
-    } finally {
-        event.target.value = "";
+        return null;
     }
+}
+
+function loadImage(imageUrl) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = imageUrl;
+    });
+}
+
+async function createEnlargedImageUrl(imageUrl) {
+    const image = await loadImage(imageUrl);
+    const canvas = document.createElement("canvas");
+    const scale = 2;
+
+    canvas.width = image.naturalWidth * scale;
+    canvas.height = image.naturalHeight * scale;
+
+    const context = canvas.getContext("2d");
+    context.imageSmoothingEnabled = false;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return new Promise(resolve => {
+        canvas.toBlob(blob => resolve(URL.createObjectURL(blob)), "image/png");
+    });
 }
 
 function stopCameraScanner() {
@@ -259,6 +348,11 @@ async function loadScanLogs() {
         row.insertCell(3).innerText = log.source;
         row.insertCell(4).innerText = new Date(log.scannedAt).toLocaleString("uk-UA");
     });
+}
+
+function showScanInfo(message) {
+    const container = document.getElementById("scanResult");
+    container.innerHTML = `<p class="hint">${message}</p>`;
 }
 
 function showScanError(message) {
