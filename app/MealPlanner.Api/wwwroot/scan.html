@@ -8,24 +8,15 @@
 <body>
     <main class="page">
         <section class="hero">
-            <p class="label">Новий use case</p>
+            <p class="label">Meal Planner API</p>
             <h1>Сканування QR/штрихкоду продукту</h1>
-            <p>
-                Ця сторінка демонструє виклик Web API через JavaScript:
-                прив'язку коду до продукту, сканування коду з камери та запис історії сканувань.
-            </p>
             <div class="hero-actions">
                 <a class="hero-link" href="index.html">Назад до API-клієнта</a>
-                <a class="hero-link secondary-link" href="swagger">Swagger</a>
             </div>
         </section>
 
         <section class="panel">
             <h2>1. Прив'язати код до продукту</h2>
-            <p class="hint">
-                Для демонстрації можна ввести будь-яке значення коду вручну, наприклад 482000000001.
-                Якщо продукт має реальний штрихкод або QR-код, можна ввести або сфотографувати його.
-            </p>
 
             <div class="toolbar">
                 <select id="foodSelect"></select>
@@ -43,23 +34,14 @@
 
         <section class="panel">
             <h2>2. Сканувати код</h2>
-            <p class="hint">
-                Якщо браузер не підтримує BarcodeDetector, сторінка використовує jsQR/ZXing fallback.
-                Для демонстрації можна сфотографувати код телефоном або завантажити готове зображення з ноутбука.
-            </p>
 
             <div class="toolbar">
-                <input id="scanInput" placeholder="Код вручну або з камери">
+                <input id="scanInput" placeholder="Код вручну або з файлу">
                 <button onclick="scanManualCode()">Знайти продукт</button>
-                <button onclick="startCameraScanner()">Увімкнути камеру</button>
-                <button onclick="openPhotoScanner()">Сфотографувати код</button>
-                <button onclick="openFileScanner()">Завантажити фото з файлу</button>
-                <button class="secondary" onclick="stopCameraScanner()">Зупинити камеру</button>
+                <button onclick="openFileScanner()">Завантажити QR/штрихкод з файлу</button>
             </div>
 
-            <input id="photoInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="scanPhotoCode(event)">
             <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="scanPhotoCode(event)">
-            <video id="cameraPreview" autoplay muted playsinline style="width:100%;max-width:520px;border-radius:18px;display:none;"></video>
             <div id="scanResult"></div>
         </section>
 
