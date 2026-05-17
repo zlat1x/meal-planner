@@ -1,10 +1,6 @@
 const foodsApi = "/api/Foods";
 const scanCodesApi = "/api/food-scan-codes";
 
-let cameraStream = null;
-let scanTimer = null;
-let zxingReader = null;
-
 async function loadFoodsForSelect() {
     const response = await fetch(foodsApi);
     const foods = await response.json();
@@ -36,8 +32,13 @@ async function createScanCode() {
         userId: document.getElementById("userIdInput").value,
         codeValue: document.getElementById("codeValueInput").value.trim(),
         codeType: document.getElementById("codeTypeInput").value,
-        note: "Created from JavaScript client"
+        note: "Created from API client"
     };
+
+    if (!request.foodId || !request.userId || request.codeValue.length === 0) {
+        showBindError("Оберіть продукт і введіть код.");
+        return;
+    }
 
     const response = await fetch(scanCodesApi, {
         method: "POST",
@@ -58,14 +59,14 @@ async function createScanCode() {
 
     const result = await response.json();
     resultText.textContent = `Код ${result.codeValue} прив'язано до продукту ${result.foodName}.`;
-    resultText.className = "";
+    resultText.className = "success";
 }
 
 async function scanManualCode() {
     const codeValue = document.getElementById("scanInput").value.trim();
 
     if (codeValue.length === 0) {
-        showScanError("Введіть або відскануйте код.");
+        showScanError("Введіть код або завантажте зображення.");
         return;
     }
 
@@ -73,6 +74,8 @@ async function scanManualCode() {
 }
 
 async function scanCode(codeValue, source) {
+    const normalizedCode = codeValue.trim();
+
     const response = await fetch(`${scanCodesApi}/scan`, {
         method: "POST",
         headers: {
@@ -80,7 +83,7 @@ async function scanCode(codeValue, source) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            codeValue: codeValue.trim(),
+            codeValue: normalizedCode,
             source: source
         })
     });
@@ -88,7 +91,7 @@ async function scanCode(codeValue, source) {
     const data = await response.json();
 
     if (!response.ok || !data.found) {
-        showScanError(`${data.message ?? "Продукт не знайдено."} Розпізнаний код: ${codeValue}`);
+        showScanError(`${data.message ?? "Продукт не знайдено."} Розпізнаний код: ${normalizedCode}`);
         await loadScanLogs();
         return;
     }
@@ -97,104 +100,16 @@ async function scanCode(codeValue, source) {
     container.innerHTML = `
         <div class="summary">
             <b>${data.foodName}</b><br>
-            Розпізнаний код: ${codeValue}<br>
+            Розпізнаний код: ${normalizedCode}<br>
             Категорія: ${data.category}<br>
-            Білки: ${data.proteinPer100} г,
-            Вуглеводи: ${data.carbsPer100} г,
-            Жири: ${data.fatPer100} г,
+            Білки: ${data.proteinPer100} г,<br>
+            Вуглеводи: ${data.carbsPer100} г,<br>
+            Жири: ${data.fatPer100} г,<br>
             Калорійність: ${data.kcalPer100} ккал
         </div>
     `;
 
     await loadScanLogs();
-}
-
-async function startCameraScanner() {
-    const video = document.getElementById("cameraPreview");
-
-    if ("BarcodeDetector" in window) {
-        await startNativeCameraScanner(video);
-        return;
-    }
-
-    if (window.ZXing) {
-        await startZxingCameraScanner(video);
-        return;
-    }
-
-    showScanError("Браузер не підтримує вбудований BarcodeDetector, а fallback-бібліотека ZXing не завантажилась. Спробуйте Chrome або кнопку «Завантажити фото з файлу».");
-}
-
-async function startNativeCameraScanner(video) {
-    const detector = new BarcodeDetector({
-        formats: ["qr_code", "ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e"]
-    });
-
-    try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: "environment"
-            }
-        });
-
-        video.srcObject = cameraStream;
-        video.style.display = "block";
-
-        scanTimer = setInterval(async () => {
-            if (video.readyState < 2) {
-                return;
-            }
-
-            const codes = await detector.detect(video);
-
-            if (codes.length > 0) {
-                const value = codes[0].rawValue;
-                document.getElementById("scanInput").value = value;
-                await scanCode(value, "Camera BarcodeDetector");
-                stopCameraScanner();
-            }
-        }, 1000);
-    } catch {
-        showScanError("Не вдалося увімкнути камеру. Дозвольте доступ до камери або відкрийте сторінку через HTTPS/localhost.");
-    }
-}
-
-async function startZxingCameraScanner(video) {
-    try {
-        zxingReader = new ZXing.BrowserMultiFormatReader();
-        video.style.display = "block";
-
-        const devices = await zxingReader.listVideoInputDevices();
-        const backCamera = devices.find(device =>
-            device.label.toLowerCase().includes("back") ||
-            device.label.toLowerCase().includes("rear") ||
-            device.label.toLowerCase().includes("environment")
-        );
-
-        const deviceId = backCamera?.deviceId ?? devices[0]?.deviceId;
-
-        if (!deviceId) {
-            showScanError("Камеру не знайдено. Перевірте дозвіл браузера на використання камери.");
-            return;
-        }
-
-        await zxingReader.decodeFromVideoDevice(deviceId, video, async (result) => {
-            if (!result) {
-                return;
-            }
-
-            const value = result.getText();
-            document.getElementById("scanInput").value = value;
-            await scanCode(value, "Camera ZXing");
-            stopCameraScanner();
-        });
-    } catch {
-        showScanError("Не вдалося запустити ZXing-сканер. Спробуйте кнопку «Завантажити фото з файлу» або ручне введення.");
-    }
-}
-
-function openPhotoScanner() {
-    document.getElementById("photoInput").click();
 }
 
 function openFileScanner() {
@@ -211,14 +126,14 @@ async function scanPhotoCode(event) {
     const imageUrl = URL.createObjectURL(file);
 
     try {
-        showScanInfo("Обробляю зображення. Якщо код маленький або розмитий, оберіть чіткіше фото.");
+        showScanInfo("Обробляю зображення...");
 
         const value = await readCodeFromPhoto(imageUrl);
 
         document.getElementById("scanInput").value = value;
         await scanCode(value, "Image upload scan");
     } catch {
-        showScanError("Не вдалося розпізнати код із зображення. Для демо завантажте саме PNG/JPG з QR-кодом, не скрін у Telegram і не зменшену превʼюшку.");
+        showScanError("Не вдалося розпізнати код із зображення. Завантажте чіткий PNG/JPG із QR-кодом або введіть код вручну.");
     } finally {
         URL.revokeObjectURL(imageUrl);
         event.target.value = "";
@@ -230,12 +145,6 @@ async function readCodeFromPhoto(imageUrl) {
 
     if (jsQrValue) {
         return jsQrValue;
-    }
-
-    const nativeValue = await tryReadPhotoWithBarcodeDetector(imageUrl);
-
-    if (nativeValue) {
-        return nativeValue;
     }
 
     const zxingValue = await tryReadPhotoWithZxing(imageUrl);
@@ -290,29 +199,6 @@ async function tryReadPhotoWithJsQr(imageUrl) {
     }
 }
 
-async function tryReadPhotoWithBarcodeDetector(imageUrl) {
-    if (!("BarcodeDetector" in window)) {
-        return null;
-    }
-
-    try {
-        const detector = new BarcodeDetector({
-            formats: ["qr_code", "ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e"]
-        });
-
-        const image = await loadImage(imageUrl);
-        const codes = await detector.detect(image);
-
-        if (codes.length === 0) {
-            return null;
-        }
-
-        return codes[0].rawValue;
-    } catch {
-        return null;
-    }
-}
-
 async function tryReadPhotoWithZxing(imageUrl) {
     if (!window.ZXing) {
         return null;
@@ -355,25 +241,6 @@ async function createEnlargedImageUrl(imageUrl) {
     });
 }
 
-function stopCameraScanner() {
-    if (scanTimer !== null) {
-        clearInterval(scanTimer);
-        scanTimer = null;
-    }
-
-    if (cameraStream !== null) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        cameraStream = null;
-    }
-
-    if (zxingReader !== null) {
-        zxingReader.reset();
-        zxingReader = null;
-    }
-
-    document.getElementById("cameraPreview").style.display = "none";
-}
-
 async function loadScanLogs() {
     const response = await fetch(`${scanCodesApi}/logs`);
     const logs = await response.json();
@@ -390,6 +257,12 @@ async function loadScanLogs() {
         row.insertCell(3).innerText = log.source;
         row.insertCell(4).innerText = new Date(log.scannedAt).toLocaleString("uk-UA");
     });
+}
+
+function showBindError(message) {
+    const resultText = document.getElementById("bindResult");
+    resultText.textContent = message;
+    resultText.className = "error";
 }
 
 function showScanInfo(message) {
