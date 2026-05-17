@@ -44,8 +44,8 @@
         <section class="panel">
             <h2>2. Сканувати код</h2>
             <p class="hint">
-                Якщо браузер не підтримує BarcodeDetector, сторінка використовує ZXing fallback.
-                На телефоні найзручніше натиснути «Сфотографувати код».
+                Якщо браузер не підтримує BarcodeDetector, сторінка використовує jsQR/ZXing fallback.
+                Для демонстрації можна сфотографувати код телефоном або завантажити готове зображення з ноутбука.
             </p>
 
             <div class="toolbar">
@@ -53,10 +53,12 @@
                 <button onclick="scanManualCode()">Знайти продукт</button>
                 <button onclick="startCameraScanner()">Увімкнути камеру</button>
                 <button onclick="openPhotoScanner()">Сфотографувати код</button>
+                <button onclick="openFileScanner()">Завантажити фото з файлу</button>
                 <button class="secondary" onclick="stopCameraScanner()">Зупинити камеру</button>
             </div>
 
             <input id="photoInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="scanPhotoCode(event)">
+            <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="scanPhotoCode(event)">
             <video id="cameraPreview" autoplay muted playsinline style="width:100%;max-width:520px;border-radius:18px;display:none;"></video>
             <div id="scanResult"></div>
         </section>
@@ -79,6 +81,7 @@
         </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
     <script src="js/scan-code-api.js"></script>
 </body>
