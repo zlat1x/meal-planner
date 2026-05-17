@@ -11,17 +11,32 @@
             <p class="label">Лабораторний проєкт №2</p>
             <h1>Meal Planner Web API</h1>
             <p>
-                Сторінка демонструє виклик Web API через JavaScript:
-                завантаження продуктів, пошук, фільтрацію та розрахунок меню.
+                JavaScript-клієнт для перевірки авторизації, роботи з продуктами,
+                розрахунку меню та сканування QR/штрихкоду.
             </p>
             <div class="hero-actions">
                 <a class="hero-link" href="scan.html">Перейти до сканування QR/штрихкоду</a>
-                <a class="hero-link secondary-link" href="swagger">Відкрити Swagger</a>
             </div>
         </section>
 
         <section class="panel">
-            <h2>Продукти</h2>
+            <h2>1. Авторизація користувача</h2>
+            <div id="authStatus" class="summary"></div>
+
+            <div class="toolbar">
+                <input id="authName" type="text" placeholder="Ім'я для реєстрації">
+                <input id="authEmail" type="email" placeholder="Email">
+                <input id="authPassword" type="password" placeholder="Пароль">
+                <button type="button" onclick="registerApiUser()">Зареєструватися</button>
+                <button type="button" onclick="loginApiUser()">Увійти</button>
+                <button type="button" class="secondary" onclick="logoutApiUser()">Вийти</button>
+            </div>
+
+            <p id="authMessage"></p>
+        </section>
+
+        <section class="panel">
+            <h2>2. Продукти</h2>
 
             <div class="toolbar">
                 <input id="searchInput" type="text" placeholder="Пошук продукту">
@@ -34,7 +49,7 @@
                 </select>
 
                 <button type="button" onclick="loadFoods()">Завантажити</button>
-                <button type="button" class="secondary" onclick="clearOutput()">Clear</button>
+                <button type="button" class="secondary" onclick="clearOutput()">Очистити</button>
             </div>
 
             <p id="counter"></p>
@@ -55,11 +70,7 @@
         </section>
 
         <section class="panel">
-            <h2>Швидка перевірка розрахунку меню</h2>
-            <p class="hint">
-                JavaScript-клієнт завантажує продукти з API, дозволяє вибрати продукти
-                для меню та надсилає запит на розрахунок.
-            </p>
+            <h2>3. Швидка перевірка розрахунку меню</h2>
 
             <div class="toolbar">
                 <input id="proteinTarget" type="number" value="90" placeholder="Білки">
@@ -94,6 +105,7 @@
         </section>
     </main>
 
+    <script src="js/auth-client.js"></script>
     <script>
         const foodsUri = "/api/Foods";
         const plannerUri = "/api/Planner/calculate";
@@ -218,6 +230,7 @@
             const proteinFood = allFoods.find(x => x.id === proteinFoodId);
             const carbFood = allFoods.find(x => x.id === carbFoodId);
             const fatFood = allFoods.find(x => x.id === fatFoodId);
+            const currentUserId = getCurrentApiUserId();
 
             document.getElementById("selectedFoodsInfo").innerHTML = `
                 <div class="summary">
@@ -229,7 +242,7 @@
             `;
 
             const request = {
-                userId: proteinFood.userId,
+                userId: currentUserId ?? proteinFood.userId,
                 days: 3,
                 mealsPerDay: Number(document.getElementById("mealsPerDay").value),
                 proteinTarget: Number(document.getElementById("proteinTarget").value),
