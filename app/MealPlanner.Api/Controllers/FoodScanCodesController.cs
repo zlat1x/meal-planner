@@ -18,11 +18,19 @@ public class FoodScanCodesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<FoodScanCodeResponse>>> Get()
+    public async Task<ActionResult<List<FoodScanCodeResponse>>> Get(Guid? userId)
     {
-        var codes = await _context.Set<FoodScanCode>()
+        var query = _context.Set<FoodScanCode>()
             .Include(x => x.Food)
             .Include(x => x.User)
+            .AsQueryable();
+
+        if (userId.HasValue)
+        {
+            query = query.Where(x => x.UserId == userId.Value);
+        }
+
+        var codes = await query
             .OrderBy(x => x.Food.Name)
             .Select(x => ToResponse(x))
             .ToListAsync();
@@ -127,7 +135,7 @@ public class FoodScanCodesController : ControllerBase
             UserId = request.UserId,
             ScannedCode = normalizedCode,
             Result = scanCode == null ? "Not found" : "Found",
-            Source = string.IsNullOrWhiteSpace(request.Source) ? "Web camera" : request.Source.Trim(),
+            Source = string.IsNullOrWhiteSpace(request.Source) ? "Image upload" : request.Source.Trim(),
             ScannedAt = DateTime.UtcNow
         };
 
@@ -147,11 +155,19 @@ public class FoodScanCodesController : ControllerBase
     }
 
     [HttpGet("logs")]
-    public async Task<ActionResult<List<FoodScanLogResponse>>> GetLogs()
+    public async Task<ActionResult<List<FoodScanLogResponse>>> GetLogs(Guid? userId)
     {
-        var logs = await _context.Set<FoodScanLog>()
+        var query = _context.Set<FoodScanLog>()
             .Include(x => x.Food)
             .Include(x => x.User)
+            .AsQueryable();
+
+        if (userId.HasValue)
+        {
+            query = query.Where(x => x.UserId == userId.Value);
+        }
+
+        var logs = await query
             .OrderByDescending(x => x.ScannedAt)
             .Select(x => new FoodScanLogResponse
             {
