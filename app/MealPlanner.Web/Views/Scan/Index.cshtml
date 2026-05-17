@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Сканування продукту";
+    var apiBaseUrl = ViewBag.ApiBaseUrl as string ?? "http://localhost:5003";
+}
+
+<section class="scan-hero mb-4">
+    <span class="info-badge">Новий сценарій</span>
+    <h1 class="display-5 mb-3">Сканування QR/штрихкоду продукту</h1>
+    <p class="dashboard-lead">
+        На цій сторінці можна прив'язати код до продукту, знайти продукт за кодом
+        та переглянути історію сканувань. Дані обробляються через Meal Planner API.
+    </p>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="section-title mt-0">1. Прив'язати код до продукту</h2>
+                <p class="card-text">
+                    Для демонстрації можна ввести будь-який код вручну, наприклад
+                    <strong>482000000001</strong>. Потім цей код можна знайти через сканування.
+                </p>
+
+                <div class="mb-3">
+                    <label for="foodSelect" class="form-label">Продукт</label>
+                    <select id="foodSelect" class="form-select"></select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="userIdInput" class="form-label">Користувач</label>
+                    <input id="userIdInput" class="form-control" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="codeValueInput" class="form-label">QR/штрихкод</label>
+                    <input id="codeValueInput" class="form-control" placeholder="Наприклад 482000000001">
+                </div>
+
+                <div class="mb-3">
+                    <label for="codeTypeInput" class="form-label">Тип коду</label>
+                    <select id="codeTypeInput" class="form-select">
+                        <option value="Barcode">Barcode</option>
+                        <option value="QR">QR</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="createScanCode()">
+                    Прив'язати код
+                </button>
+
+                <div id="bindResult" class="scan-message mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="section-title mt-0">2. Знайти продукт за кодом</h2>
+                <p class="card-text">
+                    Код можна ввести вручну або зчитати камерою. Камера працює лише у браузерах,
+                    які підтримують BarcodeDetector, і тільки в безпечному контексті HTTPS або localhost.
+                </p>
+
+                <div class="mb-3">
+                    <label for="scanInput" class="form-label">Код</label>
+                    <input id="scanInput" class="form-control" placeholder="Введіть або відскануйте код">
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button type="button" class="btn btn-primary" onclick="scanManualCode()">
+                        Знайти продукт
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="startCameraScanner()">
+                        Увімкнути камеру
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="stopCameraScanner()">
+                        Зупинити камеру
+                    </button>
+                </div>
+
+                <video id="cameraPreview" class="scan-camera" autoplay muted playsinline></video>
+                <div id="scanResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h2 class="section-title mt-0 mb-0">3. Історія сканувань</h2>
+            <button type="button" class="btn btn-outline-primary" onclick="loadScanLogs()">
+                Оновити історію
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Код</th>
+                        <th>Результат</th>
+                        <th>Продукт</th>
+                        <th>Джерело</th>
+                        <th>Час</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.mealPlannerApiBaseUrl = "@apiBaseUrl";
+    </script>
+    <script src="~/js/scan-code-web.js" asp-append-version="true"></script>
+}
