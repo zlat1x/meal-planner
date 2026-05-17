@@ -4,6 +4,7 @@ using MealPlanner.Domain.Entities;
 using MealPlanner.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MealPlanner.Api.Tests;
 
