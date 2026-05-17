@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MealPlanner.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,5 +38,13 @@ app.UseSwaggerUI();
 app.UseCors("MealPlannerClient");
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MealPlannerDbContext>();
+
+    await context.Database.MigrateAsync();
+    await MealPlannerSeed.SeedAsync(context);
+}
 
 app.Run();

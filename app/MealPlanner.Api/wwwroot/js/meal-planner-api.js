@@ -1,7 +1,8 @@
-const foodsUri = "/api/foods";
-const plannerUri = "/api/planner/calculate";
+const foodsUri = "/api/Foods";
+const plannerUri = "/api/Planner/calculate";
 
-let foods = [];
+let displayedFoods = [];
+let allFoods = [];
 
 async function loadFoods() {
     const search = document.getElementById("searchInput").value.trim();
@@ -22,9 +23,26 @@ async function loadFoods() {
         : foodsUri;
 
     const response = await fetch(url);
-    foods = await response.json();
 
-    displayFoods(foods);
+    if (!response.ok) {
+        showPlanError("Не вдалося завантажити продукти.");
+        return;
+    }
+
+    displayedFoods = await response.json();
+    displayFoods(displayedFoods);
+}
+
+async function loadAllFoods() {
+    const response = await fetch(foodsUri);
+
+    if (!response.ok) {
+        showPlanError("Не вдалося завантажити повний список продуктів.");
+        return [];
+    }
+
+    allFoods = await response.json();
+    return allFoods;
 }
 
 function displayFoods(data) {
@@ -47,19 +65,26 @@ function displayFoods(data) {
 }
 
 async function calculateDemoPlan() {
-    if (foods.length === 0) {
-        await loadFoods();
-    }
+    const foodsForCalculation = await loadAllFoods();
 
-    const proteinFood = foods.find(x => x.category === "Protein");
-    const carbFood = foods.find(x => x.category === "Carb");
-    const fatFood = foods.find(x => x.category === "Fat");
+    const proteinFood = foodsForCalculation.find(x => isCategory(x.category, "Protein"));
+    const carbFood = foodsForCalculation.find(x => isCategory(x.category, "Carb"));
+    const fatFood = foodsForCalculation.find(x => isCategory(x.category, "Fat"));
 
     if (!proteinFood || !carbFood || !fatFood) {
-        document.getElementById("planResult").innerHTML =
-            "<p class='error'>Для розрахунку потрібен хоча б один продукт кожної категорії.</p>";
+        document.getElementById("selectedFoodsInfo").innerHTML = "";
+        showPlanError("Для розрахунку потрібен хоча б один продукт кожної категорії: білковий, вуглеводний і жировий.");
         return;
     }
+
+    document.getElementById("selectedFoodsInfo").innerHTML = `
+        <div class="summary">
+            <b>Для розрахунку обрано:</b><br>
+            Білковий продукт: ${proteinFood.name}<br>
+            Вуглеводний продукт: ${carbFood.name}<br>
+            Жировий продукт: ${fatFood.name}
+        </div>
+    `;
 
     const request = {
         userId: proteinFood.userId,
@@ -83,8 +108,8 @@ async function calculateDemoPlan() {
     });
 
     if (!response.ok) {
-        document.getElementById("planResult").innerHTML =
-            "<p class='error'>Не вдалося розрахувати меню.</p>";
+        const errorText = await response.text();
+        showPlanError(`Не вдалося розрахувати меню. ${errorText}`);
         return;
     }
 
@@ -97,60 +122,122 @@ function displayPlan(result) {
 
     let html = `
         <div class="summary">
-            <b>Разом:</b>
-            ${result.actualProtein} г білків,
-            ${result.actualCarb} г вуглеводів,
-            ${result.actualFat} г жирів,
-            ${result.actualKcal} ккал
+            <b>Разом за 1 день:</b><br>
+            Білки: ${result.actualProtein} г<br>
+            Вуглеводи: ${result.actualCarb} г<br>
+            Жири: ${result.actualFat} г<br>
+            Калорійність: ${result.actualKcal} ккал
         </div>
     `;
 
     result.meals.forEach(meal => {
         html += `<h3>${meal.mealName}</h3>`;
-        html += "<ul>";
+        html += `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Продукт</th>
+                        <th>Роль</th>
+                        <th>Кількість</th>
+                        <th>Білки</th>
+                        <th>Вуглеводи</th>
+                        <th>Жири</th>
+                        <th>Ккал</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
         meal.items.forEach(item => {
             html += `
-                <li>
-                    ${item.foodName} — ${item.quantityValue} ${item.unitName}
-                    (${item.role})
-                </li>
+                <tr>
+                    <td>${item.foodName}</td>
+                    <td>${item.role}</td>
+                    <td>${item.quantityValue} ${item.unitName}</td>
+                    <td>${item.protein}</td>
+                    <td>${item.carb}</td>
+                    <td>${item.fat}</td>
+                    <td>${item.kcal}</td>
+                </tr>
             `;
         });
 
-        html += "</ul>";
+        html += `
+                </tbody>
+            </table>
+        `;
     });
 
-    html += "<h3>Список покупок на 3 дні</h3><ul>";
+    html += "<h3>Список покупок на 3 дні</h3>";
+    html += `
+        <table>
+            <thead>
+                <tr>
+                    <th>Продукт</th>
+                    <th>Кількість</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
 
     result.shoppingItems.forEach(item => {
-        html += `<li>${item.foodName}: ${item.totalQuantityValue} ${item.unitName}</li>`;
+        html += `
+            <tr>
+                <td>${item.foodName}</td>
+                <td>${item.totalQuantityValue} ${item.unitName}</td>
+            </tr>
+        `;
     });
 
-    html += "</ul>";
+    html += `
+            </tbody>
+        </table>
+    `;
 
     container.innerHTML = html;
 }
 
 function clearOutput() {
-    foods = [];
+    displayedFoods = [];
+    allFoods = [];
     document.getElementById("foodsBody").innerHTML = "";
     document.getElementById("counter").innerText = "";
+    document.getElementById("selectedFoodsInfo").innerHTML = "";
     document.getElementById("planResult").innerHTML = "";
     document.getElementById("searchInput").value = "";
     document.getElementById("categoryInput").value = "";
 }
 
+function showPlanError(message) {
+    document.getElementById("planResult").innerHTML = `<p class="error">${message}</p>`;
+}
+
+function isCategory(value, categoryName) {
+    if (categoryName === "Protein") {
+        return value === "Protein" || value === 1;
+    }
+
+    if (categoryName === "Carb") {
+        return value === "Carb" || value === 2;
+    }
+
+    if (categoryName === "Fat") {
+        return value === "Fat" || value === 3;
+    }
+
+    return false;
+}
+
 function translateCategory(category) {
-    if (category === "Protein") {
+    if (category === "Protein" || category === 1) {
         return "Білковий";
     }
 
-    if (category === "Carb") {
+    if (category === "Carb" || category === 2) {
         return "Вуглеводний";
     }
 
-    if (category === "Fat") {
+    if (category === "Fat" || category === 3) {
         return "Жировий";
     }
 

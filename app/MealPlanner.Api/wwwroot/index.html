@@ -17,6 +17,8 @@
         </section>
 
         <section class="panel">
+            <h2>Продукти</h2>
+
             <div class="toolbar">
                 <input id="searchInput" type="text" placeholder="Пошук продукту">
                 <select id="categoryInput">
@@ -49,8 +51,10 @@
         <section class="panel">
             <h2>Швидка перевірка розрахунку меню</h2>
             <p class="hint">
-                Для демонстрації автоматично береться перший продукт кожної категорії.
+                Для демонстрації API автоматично бере перший білковий, перший вуглеводний
+                та перший жировий продукт із повного списку продуктів.
             </p>
+
             <div class="toolbar">
                 <input id="proteinTarget" type="number" value="90" placeholder="Білки">
                 <input id="carbTarget" type="number" value="160" placeholder="Вуглеводи">
@@ -62,6 +66,8 @@
                 </select>
                 <button onclick="calculateDemoPlan()">Розрахувати</button>
             </div>
+
+            <div id="selectedFoodsInfo"></div>
             <div id="planResult"></div>
         </section>
     </main>
