@@ -94,24 +94,21 @@ function toggleAuthorizedContent() {
 }
 
 function renderAuthStatus() {
-    const status = document.getElementById("authStatus");
-
-    if (!status) {
-        return;
-    }
-
+    const statusElements = document.querySelectorAll(".auth-status");
     const user = getCurrentApiUser();
 
-    if (!user) {
-        status.innerHTML = "<span class='auth-badge'>Гість</span> Авторизуйтеся, щоб перейти до роботи з API-клієнтом.";
-        return;
-    }
+    statusElements.forEach(status => {
+        if (!user) {
+            status.innerHTML = "<span class='auth-badge'>Гість</span> Авторизуйтеся, щоб перейти до роботи з API-клієнтом.";
+            return;
+        }
 
-    status.innerHTML = `
-        <span class='auth-badge'>${user.role}</span>
-        Авторизовано: <b>${user.userName}</b> (${user.email})
-        <button type="button" class="secondary auth-logout-btn" onclick="logoutApiUser()">Вийти</button>
-    `;
+        status.innerHTML = `
+            <span class='auth-badge'>${user.role}</span>
+            Авторизовано: <b>${user.userName}</b> (${user.email})
+            <button type="button" class="secondary auth-logout-btn" onclick="logoutApiUser()">Вийти</button>
+        `;
+    });
 }
 
 function showAuthMessage(message, isError) {
