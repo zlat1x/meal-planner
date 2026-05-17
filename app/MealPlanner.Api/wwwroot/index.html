@@ -19,8 +19,8 @@
             </div>
         </section>
 
-        <section class="panel">
-            <h2>1. Авторизація користувача</h2>
+        <section id="authGate" class="panel auth-card">
+            <h2 class="auth-title">Вхід у систему</h2>
             <div id="authStatus" class="summary"></div>
 
             <div class="toolbar">
@@ -29,80 +29,86 @@
                 <input id="authPassword" type="password" placeholder="Пароль">
                 <button type="button" onclick="registerApiUser()">Зареєструватися</button>
                 <button type="button" onclick="loginApiUser()">Увійти</button>
-                <button type="button" class="secondary" onclick="logoutApiUser()">Вийти</button>
             </div>
 
             <p id="authMessage"></p>
         </section>
 
-        <section class="panel">
-            <h2>2. Продукти</h2>
+        <div id="appContent" hidden>
+            <section class="panel">
+                <h2>Користувач</h2>
+                <div id="authStatus" class="summary"></div>
+            </section>
 
-            <div class="toolbar">
-                <input id="searchInput" type="text" placeholder="Пошук продукту">
+            <section class="panel">
+                <h2>Продукти</h2>
 
-                <select id="categoryInput">
-                    <option value="">Усі категорії</option>
-                    <option value="Protein">Білкові</option>
-                    <option value="Carb">Вуглеводні</option>
-                    <option value="Fat">Жирові</option>
-                </select>
+                <div class="toolbar">
+                    <input id="searchInput" type="text" placeholder="Пошук продукту">
 
-                <button type="button" onclick="loadFoods()">Завантажити</button>
-                <button type="button" class="secondary" onclick="clearOutput()">Очистити</button>
-            </div>
+                    <select id="categoryInput">
+                        <option value="">Усі категорії</option>
+                        <option value="Protein">Білкові</option>
+                        <option value="Carb">Вуглеводні</option>
+                        <option value="Fat">Жирові</option>
+                    </select>
 
-            <p id="counter"></p>
+                    <button type="button" onclick="loadFoods()">Завантажити</button>
+                    <button type="button" class="secondary" onclick="clearOutput()">Очистити</button>
+                </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Назва</th>
-                        <th>Категорія</th>
-                        <th>Білки</th>
-                        <th>Вуглеводи</th>
-                        <th>Жири</th>
-                        <th>Ккал</th>
-                    </tr>
-                </thead>
-                <tbody id="foodsBody"></tbody>
-            </table>
-        </section>
+                <p id="counter"></p>
 
-        <section class="panel">
-            <h2>3. Швидка перевірка розрахунку меню</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Назва</th>
+                            <th>Категорія</th>
+                            <th>Білки</th>
+                            <th>Вуглеводи</th>
+                            <th>Жири</th>
+                            <th>Ккал</th>
+                        </tr>
+                    </thead>
+                    <tbody id="foodsBody"></tbody>
+                </table>
+            </section>
 
-            <div class="toolbar">
-                <input id="proteinTarget" type="number" value="90" placeholder="Білки">
-                <input id="carbTarget" type="number" value="160" placeholder="Вуглеводи">
-                <input id="fatTarget" type="number" value="55" placeholder="Жири">
+            <section class="panel">
+                <h2>Розрахунок меню</h2>
 
-                <select id="mealsPerDay">
-                    <option value="2">2 прийоми</option>
-                    <option value="3" selected>3 прийоми</option>
-                    <option value="4">4 прийоми</option>
-                </select>
-            </div>
+                <div class="toolbar">
+                    <input id="proteinTarget" type="number" value="90" placeholder="Білки">
+                    <input id="carbTarget" type="number" value="160" placeholder="Вуглеводи">
+                    <input id="fatTarget" type="number" value="55" placeholder="Жири">
 
-            <div class="toolbar">
-                <select id="proteinFoodSelect">
-                    <option value="">Білковий продукт</option>
-                </select>
+                    <select id="mealsPerDay">
+                        <option value="2">2 прийоми</option>
+                        <option value="3" selected>3 прийоми</option>
+                        <option value="4">4 прийоми</option>
+                    </select>
+                </div>
 
-                <select id="carbFoodSelect">
-                    <option value="">Вуглеводний продукт</option>
-                </select>
+                <div class="toolbar">
+                    <select id="proteinFoodSelect">
+                        <option value="">Білковий продукт</option>
+                    </select>
 
-                <select id="fatFoodSelect">
-                    <option value="">Жировий продукт</option>
-                </select>
+                    <select id="carbFoodSelect">
+                        <option value="">Вуглеводний продукт</option>
+                    </select>
 
-                <button type="button" onclick="calculateSelectedPlan()">Розрахувати</button>
-            </div>
+                    <select id="fatFoodSelect">
+                        <option value="">Жировий продукт</option>
+                    </select>
 
-            <div id="selectedFoodsInfo"></div>
-            <div id="planResult"></div>
-        </section>
+                    <button type="button" onclick="calculateSelectedPlan()">Розрахувати</button>
+                </div>
+
+                <div id="selectedFoodsInfo"></div>
+                <div id="planResult"></div>
+            </section>
+        </div>
     </main>
 
     <script src="js/auth-client.js"></script>
