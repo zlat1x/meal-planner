@@ -22,6 +22,8 @@ public class MealPlannerDbContext : DbContext
     public DbSet<ShopItem> ShopItems => Set<ShopItem>();
     public DbSet<Export> Exports => Set<Export>();
     public DbSet<AuthAccount> AuthAccounts => Set<AuthAccount>();
+    public DbSet<FoodScanCode> FoodScanCodes => Set<FoodScanCode>();
+    public DbSet<FoodScanLog> FoodScanLogs => Set<FoodScanLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -392,6 +394,71 @@ public class MealPlannerDbContext : DbContext
                 .WithOne()
                 .HasForeignKey<AuthAccount>(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // food_scan_code
+        modelBuilder.Entity<FoodScanCode>(e =>
+        {
+            e.ToTable("food_scan_code");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FoodId).HasColumnName("food_id");
+            e.Property(x => x.UserId).HasColumnName("user_id");
+            e.Property(x => x.CodeValue).HasColumnName("code_value").HasMaxLength(128).IsRequired();
+            e.Property(x => x.CodeType).HasColumnName("code_type").HasMaxLength(32).IsRequired();
+            e.Property(x => x.Note).HasColumnName("note").HasMaxLength(512);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+            e.HasIndex(x => x.CodeValue).IsUnique();
+            e.HasIndex(x => x.FoodId).HasDatabaseName("idx_food_scan_code_food_id");
+            e.HasIndex(x => x.UserId).HasDatabaseName("idx_food_scan_code_user_id");
+
+            e.HasOne(x => x.Food)
+                .WithMany()
+                .HasForeignKey(x => x.FoodId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // food_scan_log
+        modelBuilder.Entity<FoodScanLog>(e =>
+        {
+            e.ToTable("food_scan_log");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FoodScanCodeId).HasColumnName("food_scan_code_id");
+            e.Property(x => x.FoodId).HasColumnName("food_id");
+            e.Property(x => x.UserId).HasColumnName("user_id");
+            e.Property(x => x.ScannedCode).HasColumnName("scanned_code").HasMaxLength(128).IsRequired();
+            e.Property(x => x.Result).HasColumnName("result").HasMaxLength(64).IsRequired();
+            e.Property(x => x.Source).HasColumnName("source").HasMaxLength(128).IsRequired();
+            e.Property(x => x.ScannedAt).HasColumnName("scanned_at");
+
+            e.HasIndex(x => x.FoodScanCodeId).HasDatabaseName("idx_food_scan_log_code_id");
+            e.HasIndex(x => x.FoodId).HasDatabaseName("idx_food_scan_log_food_id");
+            e.HasIndex(x => x.UserId).HasDatabaseName("idx_food_scan_log_user_id");
+
+            e.HasOne(x => x.FoodScanCode)
+                .WithMany(x => x.ScanLogs)
+                .HasForeignKey(x => x.FoodScanCodeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasOne(x => x.Food)
+                .WithMany()
+                .HasForeignKey(x => x.FoodId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }
