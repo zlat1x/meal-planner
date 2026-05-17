@@ -16,7 +16,23 @@
         </section>
 
         <section class="panel">
-            <h2>1. Прив'язати код до продукту</h2>
+            <h2>1. Авторизація користувача</h2>
+            <div id="authStatus" class="summary"></div>
+
+            <div class="toolbar">
+                <input id="authName" type="text" placeholder="Ім'я для реєстрації">
+                <input id="authEmail" type="email" placeholder="Email">
+                <input id="authPassword" type="password" placeholder="Пароль">
+                <button type="button" onclick="registerApiUser()">Зареєструватися</button>
+                <button type="button" onclick="loginApiUser()">Увійти</button>
+                <button type="button" class="secondary" onclick="logoutApiUser()">Вийти</button>
+            </div>
+
+            <p id="authMessage"></p>
+        </section>
+
+        <section class="panel">
+            <h2>2. Прив'язати код до продукту</h2>
 
             <div class="toolbar">
                 <select id="foodSelect"></select>
@@ -33,7 +49,7 @@
         </section>
 
         <section class="panel">
-            <h2>2. Сканувати код</h2>
+            <h2>3. Сканувати код</h2>
 
             <div class="toolbar">
                 <input id="scanInput" placeholder="Код вручну або з файлу">
@@ -46,7 +62,7 @@
         </section>
 
         <section class="panel">
-            <h2>3. Історія сканувань</h2>
+            <h2>4. Історія сканувань</h2>
             <button onclick="loadScanLogs()">Оновити історію</button>
             <table>
                 <thead>
@@ -65,6 +81,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+    <script src="js/auth-client.js"></script>
     <script src="js/scan-code-api.js"></script>
 </body>
 </html>
